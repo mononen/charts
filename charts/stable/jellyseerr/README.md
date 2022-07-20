@@ -1,15 +1,15 @@
 # overseerr
 
-![Version: 5.3.2](https://img.shields.io/badge/Version-5.3.2-informational?style=flat-square) ![AppVersion: 1.26.1](https://img.shields.io/badge/AppVersion-1.26.1-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![AppVersion: 1.26.1](https://img.shields.io/badge/AppVersion-1.26.1-informational?style=flat-square)
 
-Overseerr is a free and open source software application for managing requests for your media library. It integrates with your existing services such as Sonarr, Radarr and Plex!
+Jellyseerr is a free and open source software application for managing requests for your media library. It integrates with your existing services such as Sonarr, Radarr and Jellyfin!
 
 **This chart is not maintained by the upstream project and any issues with the chart should be raised [here](https://github.com/k8s-at-home/charts/issues/new/choose)**
 
 ## Source Code
 
 * <https://github.com/sct/overseerr>
-* <https://hub.docker.com/r/sctx/overseerr>
+* <https://hub.docker.com/r/fallenbagel/jellyseerr>
 
 ## Requirements
 
@@ -80,15 +80,15 @@ N/A
 | env.LOG_LEVEL | string | `"info"` | Set the application log level |
 | env.TZ | string | `"UTC"` | Set the container timezone |
 | image.pullPolicy | string | `"IfNotPresent"` | image pull policy |
-| image.repository | string | `"ghcr.io/sct/overseerr"` | image repository |
-| image.tag | string | `"1.26.1"` | image tag |
+| image.repository | string | `"https://hub.docker.com/r/fallenbagel/jellyseerr"` | image repository |
+| image.tag | string | `"1.1.1"` | image tag |
 | ingress.main | object | See values.yaml | Enable and configure ingress settings for the chart under this key. |
 | persistence | object | See values.yaml | Configure persistence settings for the chart under this key. |
 | service | object | See values.yaml | Configures service settings for the chart. |
 
 ## Changelog
 
-### Version 5.3.2
+### Version 1.0.0
 
 #### Added
 
