@@ -2,11 +2,11 @@
 apiVersion: v2
 appVersion: 1.26.1
 description: Jellyseerr is a free and open source software application for managing requests for your media library. It integrates with your existing services such as Sonarr, Radarr and Jellyfin!
-name: overseerr
+name: jellyseerr
 version: 1.0.0
 kubeVersion: ">=1.16.0-0"
 keywords:
-  - overseerr
+  - jellyseerr
   - jellyfin
   - sonarr
   - radarr
@@ -16,8 +16,8 @@ sources:
   - https://github.com/sct/overseerr
   - https://hub.docker.com/r/fallenbagel/jellyseerr
 maintainers:
-  - name: billimek
-    email: jeff@billimek.com
+  - name: mononen
+    email: alex@mononen.dev
 dependencies:
   - name: common
     repository: https://library-charts.k8s-at-home.com
