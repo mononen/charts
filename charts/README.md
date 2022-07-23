@@ -174,6 +174,7 @@
 | [vikunja](stable/vikunja) | The to-do app to organize your life |
 | [wallabag](stable/wallabag) | A self hostable application for saving web pages, freely. |
 | [webtrees](stable/webtrees) | Open-source online collaborative genealogy application |
+| [whisparr](stable/whisparr) | Indexer manager/proxy built on the popular arr net base stack to integrate with your various PVR apps. |
 | [whoogle](stable/whoogle) | A self-hosted, ad-free, privacy-respecting metasearch engine |
 | [wikijs](stable/wikijs) | Make documentation a joy to write using Wiki.js's beautiful and intuitive interface! |
 | [wireguard](stable/wireguard) | Fast, modern, secure VPN tunnel |
