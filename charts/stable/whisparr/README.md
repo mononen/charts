@@ -1,6 +1,6 @@
-# prowlarr
+# whisparr
 
-![Version: 4.4.2](https://img.shields.io/badge/Version-4.4.2-informational?style=flat-square) ![AppVersion: v0.3.0.1710](https://img.shields.io/badge/AppVersion-v0.3.0.1710-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![AppVersion: 0.1.0.49](https://img.shields.io/badge/AppVersion-0.1.0.49-informational?style=flat-square)
 
 Indexer manager/proxy built on the popular arr net base stack to integrate with your various PVR apps.
 
@@ -8,8 +8,8 @@ Indexer manager/proxy built on the popular arr net base stack to integrate with 
 
 ## Source Code
 
-* <https://github.com/Prowlarr/Prowlarr>
-* <https://github.com/k8s-at-home/container-images>
+* <https://github.com/Whisparr/Whisparr>
+* <https://hub.docker.com/r/hotio/whisparr>
 
 ## Requirements
 
@@ -26,23 +26,23 @@ Kubernetes: `>=1.16.0-0`
 ```console
 helm repo add k8s-at-home https://k8s-at-home.com/charts/
 helm repo update
-helm install prowlarr k8s-at-home/prowlarr
+helm install whisparr k8s-at-home/whisparr
 ```
 
 ## Installing the Chart
 
-To install the chart with the release name `prowlarr`
+To install the chart with the release name `whisparr`
 
 ```console
-helm install prowlarr k8s-at-home/prowlarr
+helm install whisparr k8s-at-home/whisparr
 ```
 
 ## Uninstalling the Chart
 
-To uninstall the `prowlarr` deployment
+To uninstall the `whisparr` deployment
 
 ```console
-helm uninstall prowlarr
+helm uninstall whisparr
 ```
 
 The command removes all the Kubernetes components associated with the chart **including persistent volumes** and deletes the release.
@@ -55,15 +55,15 @@ Other values may be used from the [values.yaml](https://github.com/k8s-at-home/l
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
 ```console
-helm install prowlarr \
+helm install whisparr \
   --set env.TZ="America/New York" \
-    k8s-at-home/prowlarr
+    k8s-at-home/whisparr
 ```
 
 Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart.
 
 ```console
-helm install prowlarr k8s-at-home/prowlarr -f values.yaml
+helm install whisparr k8s-at-home/whisparr -f values.yaml
 ```
 
 ## Custom configuration
@@ -77,17 +77,18 @@ N/A
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | env | object | See below | environment variables. |
+| env.LOG_LEVEL | string | `"info"` | Set the application log level |
 | env.TZ | string | `"UTC"` | Set the container timezone |
 | image.pullPolicy | string | `"IfNotPresent"` | image pull policy |
-| image.repository | string | `"ghcr.io/k8s-at-home/prowlarr"` | image repository |
-| image.tag | string | `nil` |  |
+| image.repository | string | `"https://hub.docker.com/r/hotio/whisparr"` | image repository |
+| image.tag | string | `"nightly"` | image tag |
 | ingress.main | object | See values.yaml | Enable and configure ingress settings for the chart under this key. |
 | persistence | object | See values.yaml | Configure persistence settings for the chart under this key. |
 | service | object | See values.yaml | Configures service settings for the chart. |
 
 ## Changelog
 
-### Version 4.4.2
+### Version 1.0.0
 
 #### Added
 
@@ -103,7 +104,7 @@ N/A
 
 ### Older versions
 
-A historical overview of changes can be found on [ArtifactHUB](https://artifacthub.io/packages/helm/k8s-at-home/prowlarr?modal=changelog)
+A historical overview of changes can be found on [ArtifactHUB](https://artifacthub.io/packages/helm/k8s-at-home/whisparr?modal=changelog)
 
 ## Support
 
