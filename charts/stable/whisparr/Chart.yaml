@@ -1,0 +1,27 @@
+---
+apiVersion: v2
+appVersion: 0.1.0.49
+description: Indexer manager/proxy built on the popular arr net base stack to integrate with your various PVR apps.
+name: whisparr
+version: 1.0.0
+kubeVersion: ">=1.16.0-0"
+keywords:
+  - whisparr
+  - torrent
+  - usenet
+home: https://github.com/k8s-at-home/charts/tree/master/charts/stable/whisparr
+icon: https://raw.githubusercontent.com/Prowlarr/Prowlarr/develop/Logo/400.png
+sources:
+  - https://github.com/Whisparr/Whisparr
+  - https://hub.docker.com/r/hotio/whisparr
+maintainers:
+  - name: mononen
+    email: alex@mononen.dev
+dependencies:
+  - name: common
+    repository: https://library-charts.k8s-at-home.com
+    version: 4.4.2
+annotations:
+  artifacthub.io/changes: |-
+    - kind: changed
+      description: Upgraded `common` chart dependency to version 4.4.2
