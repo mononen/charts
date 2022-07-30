@@ -1,8 +1,8 @@
-# deluge
+# delugevpn
 
-![Version: 5.3.2](https://img.shields.io/badge/Version-5.3.2-informational?style=flat-square) ![AppVersion: v2.0.3-2201906121747](https://img.shields.io/badge/AppVersion-v2.0.3--2201906121747-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![AppVersion: v2.1.1-1-01](https://img.shields.io/badge/AppVersion-v2.1.1--1--01-informational?style=flat-square)
 
-Deluge is a torrent download client
+Deluge is a torrent download client secured with a vpn
 
 **This chart is not maintained by the upstream project and any issues with the chart should be raised [here](https://github.com/k8s-at-home/charts/issues/new/choose)**
 
@@ -26,23 +26,23 @@ Kubernetes: `>=1.16.0-0`
 ```console
 helm repo add k8s-at-home https://k8s-at-home.com/charts/
 helm repo update
-helm install deluge k8s-at-home/deluge
+helm install delugevpn k8s-at-home/delugevpn
 ```
 
 ## Installing the Chart
 
-To install the chart with the release name `deluge`
+To install the chart with the release name `delugevpn`
 
 ```console
-helm install deluge k8s-at-home/deluge
+helm install delugevpn k8s-at-home/delugevpn
 ```
 
 ## Uninstalling the Chart
 
-To uninstall the `deluge` deployment
+To uninstall the `delugevpn` deployment
 
 ```console
-helm uninstall deluge
+helm uninstall delugevpn
 ```
 
 The command removes all the Kubernetes components associated with the chart **including persistent volumes** and deletes the release.
@@ -55,15 +55,15 @@ Other values may be used from the [values.yaml](https://github.com/k8s-at-home/l
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
 ```console
-helm install deluge \
+helm install delugevpn \
   --set env.TZ="America/New York" \
-    k8s-at-home/deluge
+    k8s-at-home/delugevpn
 ```
 
 Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart.
 
 ```console
-helm install deluge k8s-at-home/deluge -f values.yaml
+helm install delugevpn k8s-at-home/delugevpn -f values.yaml
 ```
 
 ## Custom configuration
@@ -84,15 +84,15 @@ The default login details (change ASAP) are:
 | env.PUID | string | `"1000"` | Specify the user ID the application will run as |
 | env.TZ | string | `"Europe/London"` | Set the container timezone |
 | image.pullPolicy | string | `"IfNotPresent"` | image pull policy |
-| image.repository | string | `"linuxserver/deluge"` | image repository |
-| image.tag | string | `"version-2.0.3-2201906121747ubuntu18.04.1"` | image tag |
+| image.repository | string | `"ghcr.io/binhex/arch-delugevpn"` | image repository |
+| image.tag | string | `"2.1.1-1-01"` | image tag |
 | ingress.main | object | See values.yaml | Enable and configure ingress settings for the chart under this key. |
 | persistence | object | See values.yaml | Configure persistence settings for the chart under this key. |
 | service | object | See values.yaml | Configures service settings for the chart. |
 
 ## Changelog
 
-### Version 5.3.2
+### Version 1.0.0
 
 #### Added
 
@@ -108,7 +108,7 @@ N/A
 
 ### Older versions
 
-A historical overview of changes can be found on [ArtifactHUB](https://artifacthub.io/packages/helm/k8s-at-home/deluge?modal=changelog)
+A historical overview of changes can be found on [ArtifactHUB](https://artifacthub.io/packages/helm/k8s-at-home/delugevpn?modal=changelog)
 
 ## Support
 
