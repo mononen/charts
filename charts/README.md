@@ -27,6 +27,7 @@
 | [deemix](stable/deemix) | Deemix is a Deezer Download Manager |
 | [deepstack](stable/deepstack) | An AI API engine that serves pre-built models and custom models on multiple edge devices locally or on your private cloud |
 | [deluge](stable/deluge) | Deluge is a torrent download client |
+| [delugevpn](stable/delugevpn) | Deluge is a torrent download client secured with a vpn |
 | [dizquetv](stable/dizquetv) | Create live TV channel streams from media on your Plex servers. |
 | [dnsmadeeasy-webhook](stable/dnsmadeeasy-webhook) | Cert-Manager Webhook for DNSMadeEasy |
 | [dokuwiki](stable/dokuwiki) | DokuWiki is a simple to use and highly versatile Open Source wiki software that doesn't require a database. |
