@@ -1,6 +1,6 @@
 # dendrite
 
-![Version: 6.0.0](https://img.shields.io/badge/Version-6.0.0-informational?style=flat-square) ![AppVersion: v0.8.9](https://img.shields.io/badge/AppVersion-v0.8.9-informational?style=flat-square)
+![Version: 6.3.1](https://img.shields.io/badge/Version-6.3.1-informational?style=flat-square) ![AppVersion: v0.9.4](https://img.shields.io/badge/AppVersion-v0.9.4-informational?style=flat-square)
 
 Dendrite Matrix Homeserver
 
@@ -19,16 +19,16 @@ Kubernetes: `>=1.16.0-0`
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | 11.6.12 |
-| https://library-charts.k8s-at-home.com | common | 4.4.2 |
-| https://library-charts.k8s-at-home.com | keyserver(common) | 4.4.2 |
-| https://library-charts.k8s-at-home.com | clientapi(common) | 4.4.2 |
-| https://library-charts.k8s-at-home.com | mediaapi(common) | 4.4.2 |
-| https://library-charts.k8s-at-home.com | syncapi(common) | 4.4.2 |
-| https://library-charts.k8s-at-home.com | roomserver(common) | 4.4.2 |
-| https://library-charts.k8s-at-home.com | federationapi(common) | 4.4.2 |
-| https://library-charts.k8s-at-home.com | userapi(common) | 4.4.2 |
-| https://library-charts.k8s-at-home.com | appserviceapi(common) | 4.4.2 |
+| https://charts.bitnami.com/bitnami | postgresql | 11.6.21 |
+| https://library-charts.k8s-at-home.com | common | 4.5.2 |
+| https://library-charts.k8s-at-home.com | keyserver(common) | 4.5.2 |
+| https://library-charts.k8s-at-home.com | clientapi(common) | 4.5.2 |
+| https://library-charts.k8s-at-home.com | mediaapi(common) | 4.5.2 |
+| https://library-charts.k8s-at-home.com | syncapi(common) | 4.5.2 |
+| https://library-charts.k8s-at-home.com | roomserver(common) | 4.5.2 |
+| https://library-charts.k8s-at-home.com | federationapi(common) | 4.5.2 |
+| https://library-charts.k8s-at-home.com | userapi(common) | 4.5.2 |
+| https://library-charts.k8s-at-home.com | appserviceapi(common) | 4.5.2 |
 | https://nats-io.github.io/k8s/helm/charts/ | nats | 0.17.1 |
 
 ## TL;DR
@@ -119,6 +119,9 @@ For more information see:
 | dendrite | object | See values.yaml | Configuration for Dendrite. For more information see [the sample denrite-config.yaml](https://github.com/matrix-org/dendrite/blob/main/dendrite-sample.polylith.yaml) |
 | dendrite.database | object | See values.yaml | Configure database connection parameters. |
 | dendrite.global | object | See values.yaml | Configure the global settings for dendrite. |
+| dendrite.global.cache | object | `{"max_age":"1h","max_size_estimated":"1gb"}` | Congigure the in-memory caches |
+| dendrite.global.cache.max_age | string | `"1h"` | The maximum amount of time that a cache entry can live for in memory |
+| dendrite.global.cache.max_size_estimated | string | `"1gb"` | Configure the maximum estimated cache size (not a hard limit) |
 | dendrite.global.disable_federation | bool | `false` | Disables federation |
 | dendrite.global.dns_cache | object | See values.yaml | Configure DNS cache. |
 | dendrite.global.dns_cache.enabled | bool | See values.yaml | If enabled, dns cache will be enabled. |
@@ -136,6 +139,7 @@ For more information see:
 | dendrite.global.server_notices.local_part | string | `"_server"` | The server localpart to be used when sending notices, ensure this is not yet taken |
 | dendrite.global.server_notices.room_name | string | `"Server Alerts"` | The roomname to be used when creating messages |
 | dendrite.global.trusted_third_party_id_servers | list | `["matrix.org","vector.im"]` | Configure the list of domains the server will trust as identity servers |
+| dendrite.global.well_known_client_name | string | `""` | Configure the well-known client name and optional port |
 | dendrite.global.well_known_server_name | string | `""` | Configure the well-known server name and optional port |
 | dendrite.logging | list | See values.yaml | Configure logging. |
 | dendrite.matrix_key_secret.create | bool | `false` | Create matrix_key secret using the keyBody below. |
@@ -159,9 +163,9 @@ For more information see:
 | federationapi.image.pullPolicy | string | `"IfNotPresent"` | image pull policy |
 | federationapi.image.repository | string | `"matrixdotorg/dendrite-polylith"` | image repository |
 | federationapi.image.tag | string | chart.appVersion | image tag |
-| image | object | `{"pullPolicy":"IfNotPresent","repository":"matrixdotorg/dendrite-monolith","tag":null}` |  IMPORTANT NOTE This chart inherits from our common library chart. You can check the default values/options here: https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common/values.yaml |
+| image | object | `{"pullPolicy":"IfNotPresent","repository":"ghcr.io/matrix-org/dendrite-monolith","tag":null}` |  IMPORTANT NOTE This chart inherits from our common library chart. You can check the default values/options here: https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common/values.yaml |
 | image.pullPolicy | string | `"IfNotPresent"` | image pull policy |
-| image.repository | string | `"matrixdotorg/dendrite-monolith"` | image repository |
+| image.repository | string | `"ghcr.io/matrix-org/dendrite-monolith"` | image repository |
 | image.tag | string | chart.appVersion | image tag |
 | ingress.main | object | See values.yaml | (Monolith Only) Enable and configure ingress settings for the chart under this key. |
 | keyserver | object | See values.yaml | Configure the key server. For more information see [the sample dendrite configuration](https://github.com/matrix-org/dendrite/blob/main/dendrite-sample.polylith.yaml) |
@@ -198,9 +202,9 @@ For more information see:
 | postgresql.auth.username | string | `"dendrite"` |  |
 | postgresql.enabled | bool | See value.yaml | Enable and configure postgres as the database for dendrite. |
 | postgresql.image.repository | string | `"bitnami/postgresql"` |  |
-| postgresql.image.tag | string | `"14.1.0"` |  |
-| postgresql.persistence.enabled | bool | `false` |  |
+| postgresql.image.tag | string | `"14.4.0"` |  |
 | postgresql.primary.initdb.scriptsConfigMap | string | `"dendrite-postgresql-init-scripts"` |  |
+| postgresql.primary.persistence.enabled | bool | `false` |  |
 | roomserver | object | values.yaml | Configure the Room Server For more information see [the sample dendrite configuration](https://github.com/matrix-org/dendrite/blob/main/dendrite-sample.polylith.yaml) |
 | roomserver.database | object | See values.yaml | Override general dendrite.database parameters. |
 | roomserver.database.conn_max_lifetime | string | dendrite.database.conn_max_lifetime | Maximum connection lifetime |
@@ -235,16 +239,15 @@ For more information see:
 
 ## Changelog
 
-### Version 6.0.0
+### Version 6.3.1
 
 #### Added
 
-* Added ingress for polylith mode
+N/A
 
 #### Changed
 
-* Upgraded `dendrite` dependency to version 0.8.9
-* **Breaking**: Updated default config as per separate monolith/polylith samples
+* Upgraded dendrite to 0.9.4
 
 #### Fixed
 

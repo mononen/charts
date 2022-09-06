@@ -8,7 +8,7 @@
 ---
 image:
   # -- image repository
-  repository: matrixdotorg/dendrite-monolith
+  repository: ghcr.io/matrix-org/dendrite-monolith
   # -- image tag
   # @default -- chart.appVersion
   tag:
@@ -525,8 +525,16 @@ dendrite:
     server_name: localhost
     # -- Configure the key_validity period
     key_validity_period: 168h0m0s
+    # -- Congigure the in-memory caches
+    cache:
+      # -- Configure the maximum estimated cache size (not a hard limit)
+      max_size_estimated: "1gb"
+      # -- The maximum amount of time that a cache entry can live for in memory
+      max_age: "1h"
     # -- Configure the well-known server name and optional port
     well_known_server_name: ""
+    # -- Configure the well-known client name and optional port
+    well_known_client_name: ""
     # -- Configure the list of domains the server will trust as identity servers
     trusted_third_party_id_servers:
       - matrix.org
@@ -600,14 +608,14 @@ postgresql:
   enabled: false
   image:
     repository: bitnami/postgresql
-    tag: "14.1.0"
+    tag: "14.4.0"
   auth:
     username: dendrite
     password: changeme
     database: dendrite
-  persistence:
-    enabled: false
   primary:
+    persistence:
+      enabled: false
     initdb:
       scriptsConfigMap: "dendrite-postgresql-init-scripts"
 

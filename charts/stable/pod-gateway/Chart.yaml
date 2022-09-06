@@ -1,9 +1,9 @@
 ---
 apiVersion: v2
-appVersion: v1.6.0
+appVersion: v1.6.1
 description: Admision controller to change the default gateway and DNS server of PODs
 name: pod-gateway
-version: 5.5.1
+version: 5.6.2
 kubeVersion: ">=1.16.0-0"
 keywords:
   - pod-gateway
@@ -18,8 +18,8 @@ maintainers:
 dependencies:
   - name: common
     repository: https://library-charts.k8s-at-home.com
-    version: 4.4.2
+    version: 4.5.2
 annotations:
   artifacthub.io/changes: |-
-    - kind: fixed
-      description: Set proper defaults for image tags in webhook deployment.
+    - kind: changed
+      description: Upgraded `common` chart dependency to version 4.5.2
