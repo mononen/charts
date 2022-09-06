@@ -22,10 +22,10 @@ additionalContainers:
     image: "{{ .Values.metrics.exporter.image.repository }}:{{ .Values.metrics.exporter.image.tag }}"
     imagePullPolicy: {{ .Values.metrics.exporter.image.pullPolicy }}
     env:
-      - name: QBITTORRENT_HOST
-        value: "http://localhost"
-      - name: QBITTORRENT_PORT
-        value: "{{ .Values.service.main.ports.http.port }}"
+      # - name: QBITTORRENT_HOST
+      #   value: "{{ .Values.service.exporter.env.host }}"
+      # - name: QBITTORRENT_PORT
+      #   value: "{{ .Values.service.main.ports.http.port }}"
       - name: QBITTORRENT_USER
         value: "{{ .Values.metrics.exporter.env.user }}"
       - name: QBITTORRENT_PASS
