@@ -105,3 +105,4 @@ metrics:
       port: 9022
       # -- log level [DEBUG|INFO|WARNING|ERROR|CRITICAL]
       logLevel: INFO
+      host: http://localhost:8080

@@ -22,13 +22,13 @@ additionalContainers:
     image: "{{ .Values.metrics.exporter.image.repository }}:{{ .Values.metrics.exporter.image.tag }}"
     imagePullPolicy: {{ .Values.metrics.exporter.image.pullPolicy }}
     env:
-      # - name: QBITTORRENT_HOST
-      #   value: "{{ .Values.service.exporter.env.host }}"
-      # - name: QBITTORRENT_PORT
-      #   value: "{{ .Values.service.main.ports.http.port }}"
-      - name: QBITTORRENT_USER
+      - name: QBITTORRENT_BASE_URL
+        value: "{{ .Values.metrics.exporter.env.host }}"
+      - name: QBITTORRENT_PORT
+        value: "{{ .Values.service.main.ports.http.port }}"
+      - name: QBITTORRENT_USERNAME
         value: "{{ .Values.metrics.exporter.env.user }}"
-      - name: QBITTORRENT_PASS
+      - name: QBITTORRENT_PASSWORD
         value: "{{ .Values.metrics.exporter.env.password }}"
       - name: EXPORTER_PORT
         value: "{{ .Values.metrics.exporter.env.port }}"
