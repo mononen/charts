@@ -7,10 +7,10 @@
 
 image:
   # -- image repository
-  repository: jellyfin/jellyfin
+  repository: adoah/jellyfin
   # -- image tag
   # @default -- chart.appVersion
-  tag:
+  tag: v10.8.1
   # -- image pull policy
   pullPolicy: IfNotPresent
 
@@ -50,10 +50,10 @@ persistence:
     mountPath: /media
 
 # -- Configure the Security Context for the Pod
-podSecurityContext: {}
-#   runAsUser: 568
-#   runAsGroup: 568
-#   fsGroup: 568
+podSecurityContext: 
+  runAsUser: 568
+  runAsGroup: 568
+  fsGroup: 568
 #   # Hardware acceleration using an Intel iGPU w/ QuickSync
 #   # These IDs below should be matched to your `video` and `render` group on the host
 #   # To obtain those IDs run the following grep statement on the host:

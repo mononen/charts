@@ -1,6 +1,6 @@
 # qbittorrent
 
-![Version: 13.5.3](https://img.shields.io/badge/Version-13.5.3-informational?style=flat-square) ![AppVersion: v4.4.2](https://img.shields.io/badge/AppVersion-v4.4.2-informational?style=flat-square)
+![Version: 13.5.4](https://img.shields.io/badge/Version-13.5.4-informational?style=flat-square) ![AppVersion: v4.4.2](https://img.shields.io/badge/AppVersion-v4.4.2-informational?style=flat-square)
 
 qBittorrent is a cross-platform free and open-source BitTorrent client
 
@@ -83,6 +83,7 @@ N/A
 | image.tag | string | `nil` |  |
 | ingress.main | object | See values.yaml | Enable and configure ingress settings for the chart under this key. |
 | metrics.enabled | bool | See values.yaml | Enable and configure prometheus-qbittorrent-exporter sidecar and Prometheus podMonitor. |
+| metrics.exporter.env.host | string | `"http://localhost:8080"` |  |
 | metrics.exporter.env.logLevel | string | `"INFO"` | log level [DEBUG|INFO|WARNING|ERROR|CRITICAL] |
 | metrics.exporter.env.password | string | `"adminadmin"` | qbittorrent password update value after configuring qbittorrent |
 | metrics.exporter.env.port | int | `9022` | metrics port |
@@ -101,7 +102,7 @@ N/A
 
 ## Changelog
 
-### Version 13.5.3
+### Version 13.5.4
 
 #### Added
 

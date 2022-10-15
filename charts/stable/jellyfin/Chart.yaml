@@ -15,7 +15,7 @@ sources:
   - https://hub.docker.com/r/jellyfin/jellyfin
   - https://github.com/jellyfin/jellyfin
 maintainers:
-  - name: billimek
+  - name: adoah
     email: jeff@billimek.com
 dependencies:
   - name: common
