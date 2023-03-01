@@ -28,7 +28,6 @@ env:
 # @default -- See values.yaml
 service:
   main:
-    primary: true
     ports:
       p1:
         port: 13100
