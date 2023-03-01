@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ghidra.fullname" . }}
+  labels:
+    {{- include "ghidra.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.con1.port }}
+      targetPort: {{ .Values.service.con1.containerPort}}
+      protocol: TCP
+      name: con1
+    - port: {{ .Values.service.con2.port }}
+      targetPort: {{ .Values.service.con2.containerPort}}
+      protocol: TCP
+      name: con2
+    - port: {{ .Values.service.con3.port }}
+      targetPort: {{ .Values.service.con3.containerPort}}
+      protocol: TCP
+      name: con3
+  selector:
+    {{- include "ghidra.selectorLabels" . | nindent 4 }}
