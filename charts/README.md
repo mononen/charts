@@ -51,6 +51,7 @@
 | [games-on-whales](stable/games-on-whales) | Streams graphic applications/games (retroarch, firefox, steam) runing on Kubernetes |
 | [gaps](stable/gaps) | Gaps searches through your Plex Server or local folders for all movies, then queries for known movies in the same collection. |
 | [gatus](stable/gatus) | A developer-oriented health dashboard that gives you the ability to monitor your services using HTTP, ICMP, TCP, and even DNS queries. |
+| [ghidra](stable/ghidra) | Ghidra Server for reverse engineering |
 | [ghost](stable/ghost) | Ghost is a blogging and publishing software |
 | [gollum](stable/gollum) | Gollum is a simple wiki system built on top of Git |
 | [gonic](stable/gonic) | Music streaming server / subsonic server API implementation |
@@ -153,6 +154,7 @@
 | [speedtest-exporter](stable/speedtest-exporter) | Speedtest Exporter made in python using the official speedtest bin |
 | [stash](stable/stash) | An organizer for your porn, written in Go |
 | [statping](stable/statping) | Status page for monitoring your websites and applications |
+| [supabase](stable/supabase) | The open source Firebase alternative. |
 | [syncthing](stable/syncthing) | Open Source Continuous File Synchronization |
 | [syslog-ng](stable/syslog-ng) | syslog-ng allows you to flexibly collect, parse, classify, rewrite and correlate logs. |
 | [tautulli](stable/tautulli) | A Python based monitoring and tracking tool for Plex Media Server |
