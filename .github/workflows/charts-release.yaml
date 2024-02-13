@@ -40,19 +40,6 @@ jobs:
         id: collect-changes
         uses: ./.github/actions/collect-changes
 
-      - name: Generate README for changed charts
-        if: |
-          steps.collect-changes.outputs.changesDetected == 'true'
-        run: |
-          CHARTS=(${{ steps.collect-changes.outputs.addedOrModifiedCharts }})
-          for i in "${CHARTS[@]}"
-          do
-              IFS='/' read -r -a chart_parts <<< "$i"
-              if [ -f "charts/${chart_parts[0]}"/"${chart_parts[1]}/Chart.yaml" ]; then
-                ./.github/scripts/gen-helm-docs.sh "${chart_parts[0]}" "${chart_parts[1]}"
-              fi
-          done
-
       - name: Create commit
         id: create-commit
         uses: stefanzweifel/git-auto-commit-action@v4
