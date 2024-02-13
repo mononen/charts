@@ -36,11 +36,6 @@ jobs:
           helm: "3.8.0"
           yq: "4.16.2"
 
-      - name: Install helm-docs
-        run: |
-          wget -O /tmp/helm-docs.deb  https://github.com/k8s-at-home/helm-docs/releases/download/v0.1.1/helm-docs_0.1.1_Linux_x86_64.deb
-          sudo dpkg -i /tmp/helm-docs.deb
-
       - name: Collect changes
         id: collect-changes
         uses: ./.github/actions/collect-changes
