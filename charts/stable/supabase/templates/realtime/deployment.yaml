@@ -45,10 +45,11 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              until pg_isready -h $(DB_HOST) -p $(DB_PORT) -U $(DB_USER); do
+              until pg_isready -h $(DB_HOST) -p $(DB_PORT) -U $(DB_USER);
+              do
               echo "Waiting for database to start..."
               sleep 2
-              done
+              done;
             - echo "Database is ready"
       containers:
         - name: {{ include "supabase.realtime.name" $ }}
