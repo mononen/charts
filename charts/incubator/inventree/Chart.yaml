@@ -1,0 +1,14 @@
+---
+apiVersion: v2
+appVersion: 0.15.7
+description: inventree helm package
+name: inventree
+version: 0.1.0
+kubeVersion: ">=1.16.0-0"
+keywords:
+  - inventree
+sources:
+  - https://hub.docker.com/r/jlesage/handbrake
+maintainers:
+  - name: Alex Mononen
+    email: alex@mononen.dev
