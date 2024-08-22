@@ -198,6 +198,7 @@
 | [cryptpad](incubator/cryptpad) | cryptpad helm package |
 | [dendrite](incubator/dendrite) | Dendrite Matrix Homeserver |
 | [handbrake](incubator/handbrake) | handbrake helm package |
+| [inventree](incubator/inventree) | inventree helm package |
 | [kah-common-chart](incubator/kah-common-chart) | A KaH-common powered chart template. This can be useful for small projects that don't have their own chart. |
 | [lancache](incubator/lancache) | LanCache Monolithic - a caching proxy server for game download content |
 | [mopidy](incubator/mopidy) | mopidy helm package |
