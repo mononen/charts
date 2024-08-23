@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "inventree.fullname" . }}-worker
+  labels:
+    {{- include "inventree.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "inventree.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "inventree.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "inventree.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      {{- with .Values.worker }}
+      - name: {{ .name }}
+        image: "{{ .image.repository }}:{{ .image.tag }}"
+        envFrom:
+          - configMapRef:
+              name: inventree-config
+        args:
+          - invoke
+          - worker
+        volumeMounts:
+          - mountPath: /home/inventree/data
+            name: inventree-data         
+        resources:
+            {{- toYaml .resources | nindent 12 }}
+      {{- end }}
+      volumes:
+      - name: inventree-data
+        persistentVolumeClaim:
+          claimName: inventree-data
+      restartPolicy: Always
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
