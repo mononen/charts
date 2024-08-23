@@ -3,14 +3,14 @@ kind: Deployment
 metadata:
   name: {{ include "inventree.fullname" . }}-worker
   labels:
-    {{- include "inventree.labels" . | nindent 4 }}
+    {{- include "inventree.labels" . | nindent 4 }}-worker
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "inventree.selectorLabels" . | nindent 6 }}
+      {{- include "inventree.selectorLabels" . | nindent 6 }}-worker
   template:
     metadata:
       {{- with .Values.podAnnotations }}

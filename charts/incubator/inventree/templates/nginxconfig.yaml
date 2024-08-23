@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: inventree-nginx-config
 data:
-  nginx.conf: |
+  default.conf: |
     server {
 
         # Listen for connection on (internal) port 80

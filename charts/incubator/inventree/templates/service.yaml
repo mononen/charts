@@ -9,9 +9,9 @@ spec:
   ports:
     - name: server
       port: {{ .Values.server.service.port }}
-      targetPort: {{ .Values.server.service.port }}
+      targetPort: server
     - name: proxy
       port: {{ .Values.proxy.service.port }}
-      targetPort: {{ .Values.proxy.service.port }}
+      targetPort: http
   selector:
     {{- include "inventree.selectorLabels" . | nindent 4 }}
