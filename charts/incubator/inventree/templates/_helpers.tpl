@@ -51,6 +51,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Worker selector labels
+*/}}
+{{- define "inventree-worker.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "inventree.name" . }}-worker
+app.kubernetes.io/instance: {{ .Release.Name }}-worker
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "inventree.serviceAccountName" -}}
