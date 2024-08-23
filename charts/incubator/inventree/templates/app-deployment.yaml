@@ -54,10 +54,10 @@ spec:
           - mountPath: /var/www/static
             name: inventree-data
             subPath: static
-        # lifecycle:
-        #   postStart:
-        #     exec:
-        #       command: ["/bin/sh", "-c", "cp -rf /home/inventree/InvenTree/InvenTree/static /home/inventree/data && cp -rf /home/inventree/InvenTree/InvenTree/static_i18n/i18n /var/www/static/i18n && cp -rf /root/.local/lib/python3.9/site-packages/django/contrib/admin/static/admin /var/www/static/admin"]
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "cp -rf /home/inventree/src/backend/InvenTree/InvenTree/static /home/inventree/data && cp -rf /home/inventree/src/backend/InvenTree/InvenTree/static_i18n/i18n /var/www/static/i18n && cp -rf /root/.local/lib/python3.11/site-packages/django/contrib/admin/static/admin /var/www/static/admin"]
         resources:
             {{- toYaml .resources | nindent 12 }}
 
