@@ -13,6 +13,7 @@ config:
   # webPort: 1337
   cacheHost: "inventree-cache"
   cachePort: 6379
+  siteUrl: "https://inventree.localhost"
   database:
     engine: postgresql
     host: ""
@@ -26,7 +27,7 @@ persistence:
   storageClass: ""
 
 server:
-  name: inventree-server
+  name: server
   image:
     repository: inventree/inventree
     pullPolicy: IfNotPresent

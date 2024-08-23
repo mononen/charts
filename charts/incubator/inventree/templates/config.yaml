@@ -12,6 +12,7 @@ data:
   # INVENTREE_WEB_PORT: "1337"  
   INVENTREE_CACHE_HOST: {{ .cacheHost }}
   INVENTREE_CACHE_PORT: "{{ .cachePort }}"
+  INVENTREE_SITE_URL: "{{ .siteUrl }}"
 ### CONFIGURE YOUR VALUES BELOW 
   {{- with .database }}
   INVENTREE_DB_ENGINE: {{ .engine }}
