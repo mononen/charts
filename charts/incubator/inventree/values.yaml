@@ -14,7 +14,7 @@ config:
   cacheHost: "inventree-cache"
   cachePort: 6379
   database:
-    engine: "postgresql"
+    engine: postgresql
     host: ""
     port: 5432
     name: inventree

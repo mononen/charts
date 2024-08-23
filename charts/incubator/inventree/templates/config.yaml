@@ -13,7 +13,7 @@ data:
   INVENTREE_CACHE_HOST: {{ .cacheHost }}
   INVENTREE_CACHE_PORT: "{{ .cachePort }}"
 ### CONFIGURE YOUR VALUES BELOW 
-  {{- with .database -}}
+  {{- with .database }}
   INVENTREE_DB_ENGINE: {{ .engine }}
   INVENTREE_DB_HOST: {{ .host }}
   INVENTREE_DB_PORT: "{{ .port }}"
