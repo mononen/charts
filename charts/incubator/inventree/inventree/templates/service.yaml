@@ -1,15 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "inventree.fullname" . }}
+  name: {{ include "inventree.fullname" . }}-app
   labels:
     {{- include "inventree.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.server.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+    - name: server
+      port: {{ .Values.server.service.port }}
+      targetPort: {{ .Values.server.service.port }}
+    - name: proxy
+      port: {{ .Values.proxy.service.port }}
+      targetPort: {{ .Values.proxy.service.port }}
   selector:
     {{- include "inventree.selectorLabels" . | nindent 4 }}

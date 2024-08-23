@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventree-config
+data:
+{{- with .Values.config -}}
+  INVENTREE_DEBUG: "{{ .debug }}"
+  INVENTREE_EXT_VOLUME: {{ .extVolume }}
+  INVENTREE_LOG_LEVEL: {{ .logLevel }}
+  INVENTREE_PLUGINS_ENABLED: "{{ .pluginsEnabled }}"
+  INVENTREE_TAG: {{ .tag }}
+  # INVENTREE_WEB_PORT: "1337"  
+  INVENTREE_CACHE_HOST: {{ .cacheHost }}
+  INVENTREE_CACHE_PORT: {{ .cachePort }}
+### CONFIGURE YOUR VALUES BELOW 
+  {{- with .database -}}
+  INVENTREE_DB_ENGINE: {{ .engine }}
+  INVENTREE_DB_HOST: {{ .host }}
+  INVENTREE_DB_PORT: {{ .port }}
+  INVENTREE_DB_NAME: {{ .name }}
+  INVENTREE_DB_USER: {{ .user }}
+  INVENTREE_DB_PASSWORD: {{ .password }}
+  # INVENTREE_ADMIN_USER: "johndoe"
+  # INVENTREE_ADMIN_EMAIL: "johndoe@example.com"
+  # INVENTREE_ADMIN_PASSWORD: "secret"
+  {{- end -}}
+{{- end -}}
