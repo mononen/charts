@@ -33,7 +33,7 @@ spec:
           - configMapRef:
               name: inventree-config
         image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
-        workingDir: /home/inventree/InvenTree
+        workingDir: /home/inventree/InvenTree/src/backend
         command: ["python", "manage.py", "migrate"]
         volumeMounts:
         - mountPath: /home/inventree/data
