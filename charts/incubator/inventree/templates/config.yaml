@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: inventree-config
 data:
-{{- with .Values.config -}}
+{{- with .Values.config }}
   INVENTREE_DEBUG: "{{ .debug }}"
   INVENTREE_EXT_VOLUME: {{ .extVolume }}
   INVENTREE_LOG_LEVEL: {{ .logLevel }}
