@@ -32,7 +32,7 @@ spec:
         envFrom:
           - configMapRef:
               name: inventree-config
-        image: "{{ .image.repository }}:{{ .image.tag }}"
+        image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
         workingDir: /home/inventree/InvenTree
         command: ["python", "manage.py", "migrate"]
         volumeMounts:
