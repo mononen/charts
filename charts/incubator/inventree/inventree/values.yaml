@@ -21,6 +21,10 @@ config:
     user: inventree
     password: ""
 
+persistence:
+  size: 1Gi
+  storageClass: ""
+
 server:
   name: inventree-server
   image:
