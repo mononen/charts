@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:        
   name: inventree-data
 spec:
-  storageClassName: ""
+  storageClassName: {{ .Values.persistence.storageClass }}
   accessModes:
     - ReadWriteOnce
   resources:
