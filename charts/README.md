@@ -70,6 +70,7 @@
 | [influxdb-exporter](stable/influxdb-exporter) | An exporter for metrics in the InfluxDB format, transforms them and exposes them for consumption by Prometheus. |
 | [intel-gpu-plugin](stable/intel-gpu-plugin) | The Intel GPU plugin facilitates offloading the processing of computation intensive workloads to GPU hardware |
 | [jackett](stable/jackett) | API Support for your favorite torrent trackers |
+| [jdownloader](stable/jdownloader) | JDownloader 2 - Free download management tool with web GUI |
 | [jellyfin](stable/jellyfin) | Jellyfin is a Free Software Media System |
 | [jellyseerr](stable/jellyseerr) | Jellyseerr is a free and open source software application for managing requests for your media library. It integrates with your existing services such as Sonarr, Radarr and Jellyfin! |
 | [joplin-server](stable/joplin-server) | This server allows you to sync any Joplin client |
