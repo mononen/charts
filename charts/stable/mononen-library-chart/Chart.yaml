@@ -1,5 +1,5 @@
 apiVersion: v2
-name: common-library-chart
+name: mononen-library-chart
 description: A Helm library chart providing reusable templates for Kubernetes resources.
 type: library
 version: 1.0.0-dev
@@ -11,9 +11,9 @@ keywords:
   - deployment
   - service
 maintainers:
-  - name: Mosaic Learning
-    email: devops@mosaiclearning.com
-    url: www.mosaiclearning.com
+  - name: Alex Mononen
+    email: alex@mononen.dev
+    url: www.mononen.dev
 # Version is managed via git tags (e.g., v1.0.5)
 # CI/CD pipeline extracts version from tags and updates this file before packaging
 
