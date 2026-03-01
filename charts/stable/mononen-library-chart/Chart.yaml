@@ -1,0 +1,19 @@
+apiVersion: v2
+name: common-library-chart
+description: A Helm library chart providing reusable templates for Kubernetes resources.
+type: library
+version: 1.0.0-dev
+appVersion: "1.0.0-dev"
+keywords:
+  - library
+  - common
+  - kubernetes
+  - deployment
+  - service
+maintainers:
+  - name: Mosaic Learning
+    email: devops@mosaiclearning.com
+    url: www.mosaiclearning.com
+# Version is managed via git tags (e.g., v1.0.5)
+# CI/CD pipeline extracts version from tags and updates this file before packaging
+

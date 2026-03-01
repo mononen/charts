@@ -1,0 +1,180 @@
+# Default values for common-library-chart
+# These values serve as documentation and defaults that consuming charts can override
+
+global:
+  # Identity
+  clientCode: ""
+  project: ""
+  env: dev
+  namespace: ""
+  
+  # Networking
+  domain: ""
+  certificateARN: ""
+  
+  # Resource generation toggles (all true by default)
+  resources:
+    deployments: true
+    services: true
+    hpas: true
+    pdbs: true
+    serviceaccounts: true
+    restartCronjobs: true
+    serviceMonitors: true
+    ingresses: true
+    configmaps: true
+    secrets: true
+    cronjobs: true
+    jobs: true
+  
+  # Security defaults (enabled by default)
+  security:
+    enabled: true
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 82
+      runAsGroup: 82
+      fsGroup: 82
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+  
+  # Image defaults
+  imageDefaults:
+    registry: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  
+  # Observability
+  logs:
+    lokiEndpoint: ""
+
+  logging:
+    image:
+      repository: registry.moslrn.net/dh/grafana/alloy
+      tag: v1.9.1
+
+# Components map - consuming charts define their components here
+# Example structure:
+# components:
+#   myapp:
+#     enabled: true
+#     
+#     # Per-component resource generation override
+#     generate:
+#       deployment: true
+#       service: true
+#       hpa: true
+#       pdb: true
+#       serviceaccount: true
+#     
+#     # Containers (flexible list)
+#     containers:
+#       - name: myapp
+#         image:
+#           registry: ""      # Falls back to global
+#           repository: ""    # Required
+#           tag: ""           # Falls back to Chart.AppVersion
+#         ports: []
+#         resources: {}
+#         env: []
+#         envFrom: []
+#         livenessProbe: {}
+#         readinessProbe: {}
+#         volumeMounts: []
+#     
+#     sidecars: []
+#     initContainers: []
+#     volumes: []
+#     
+#     # Service config
+#     service:
+#       enabled: true
+#       type: ClusterIP
+#       port: 80
+#       targetPort: http
+#       additionalPorts: []
+#       annotations: {}
+#     
+#     # Ingress config
+#     ingress:
+#       subdomain: ""           # Override subdomain (defaults to component name)
+#       certificateARN: ""      # Override global certificate ARN
+#       paths: []               # Custom path routing (defaults to / -> service)
+#       internal:
+#         enabled: true         # Internal ALB (enabled by default)
+#         healthcheckPath: ""   # Optional: override auto-inherited from probes
+#                               # Auto-inherits from readinessProbe/livenessProbe httpGet.path
+#         annotations: {}
+#       external:
+#         enabled: false        # External ALB (disabled by default)
+#         healthcheckPath: ""   # Optional: override auto-inherited from probes
+#                               # Set different path for external ALB if needed
+#         annotations: {}
+#     
+#     # Autoscaling
+#     autoscaling:
+#       enabled: true
+#       minReplicas: 2
+#       maxReplicas: 10
+#       metrics: []
+#     
+#     # PDB
+#     pdb:
+#       enabled: true
+#       minAvailable: 1
+#     
+#     # Service Account
+#     serviceAccount:
+#       create: true
+#       name: ""
+#       annotations: {}
+#     
+#     # Restart CronJob
+#     restartCronJob:
+#       enabled: false
+#       schedule: "0 9 * * *"
+#     
+#     # ServiceMonitor
+#     serviceMonitor:
+#       enabled: false
+#       interval: 30s
+#       scrapeTimeout: 10s
+#       endpoints: []
+
+#     # Logging (Alloy/Loki sidecar)
+#     logging:
+#       enabled: false             # Enable logging sidecar
+#       customConfig: false        # If true, create your own alloy-configmap template
+#       appName: ""                # App name in log labels (defaults to fullname)
+#       lokiAuthSecret: "loki-auth" # Secret containing LOKI_USERNAME and LOKI_PASSWORD
+#       image:                      # Override logging sidecar image
+#         repository: ""            # Falls back to global.logging.image.repository
+#         tag: ""                   # Falls back to global.logging.image.tag
+#       resources: {}               # Override default resources
+#       securityContext: {}         # Override default securityContext
+#       logTargets:                 # Define log sources
+#         - name: nginx-logs        # Volume name (mounted at /var/log/<name>)
+#           jobs:
+#             - name: nginx-access  # Job name for Loki labels
+#               sidecarLogfile: access.log  # Filename within the volume
+#               autoConfigure: true         # Auto-generate Alloy scrape config
+#               level: info                 # Optional log level label
+#               multilinePattern: ""        # Optional multiline regex
+#               dropPattern: ""             # Optional drop filter regex
+#     
+#     # Security override
+#     security:
+#       enabled: null      # null = inherit global
+#     
+#     # Pod config
+#     replicaCount: 1
+#     podAnnotations: {}
+#     nodeSelector: {}
+#     tolerations: []
+#     affinity: {}
+
+components: {}
+

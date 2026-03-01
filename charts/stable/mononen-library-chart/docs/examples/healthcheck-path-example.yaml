@@ -1,0 +1,153 @@
+# Example: ALB Healthcheck Path - Automatic Inheritance and Manual Override
+#
+# This example demonstrates:
+# 1. Automatic inheritance from container probes (recommended)
+# 2. Manual override when needed
+# 3. Different paths for internal vs external ALBs
+
+global:
+  clientCode: myorg
+  project: myapp
+  env: dev
+  namespace: myorg
+  domain: example.com
+  certificateARN: "arn:aws:acm:us-east-1:123456789012:certificate/abc-123"
+  
+  alb:
+    prefix: myorg  # Auto-generates ALB names
+  
+  imageDefaults:
+    registry: registry.moslrn.net
+    pullPolicy: IfNotPresent
+    pullSecrets:
+      - name: harbor
+
+components:
+  # Example 1: Automatic inheritance (recommended - no manual config needed!)
+  api:
+    enabled: true
+    containers:
+      - name: api
+        image:
+          repository: myorg/api
+        ports:
+          - name: http
+            containerPort: 8080
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        # ALB automatically inherits from readinessProbe!
+        readinessProbe:
+          httpGet:
+            path: /health      # ← ALB automatically uses this
+            port: http
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: http
+          periodSeconds: 10
+    
+    service:
+      port: 80
+      targetPort: http
+    
+    ingress:
+      subdomain: "api"
+      internal:
+        enabled: true
+        # No healthcheckPath needed - auto-inherited from readinessProbe!
+      external:
+        enabled: true
+        # Also auto-inherited for external
+  
+  # Example 2: Manual override - different paths for ALB vs K8s probes
+  frontend:
+    enabled: true
+    containers:
+      - name: frontend
+        image:
+          repository: myorg/frontend
+        ports:
+          - name: http
+            containerPort: 3000
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        # K8s uses /ready for pod readiness
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: http
+    
+    service:
+      port: 80
+      targetPort: http
+    
+    ingress:
+      subdomain: "app"
+      internal:
+        enabled: true
+        # Override: ALB uses lighter endpoint than K8s
+        healthcheckPath: "/healthz"
+      external:
+        enabled: true
+        # Different check for external traffic
+        healthcheckPath: "/health/external"
+  
+  # Example 3: Only internal ALB inherits, external overrides
+  admin:
+    enabled: true
+    containers:
+      - name: admin
+        image:
+          repository: myorg/admin
+        ports:
+          - name: http
+            containerPort: 8080
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        # Both ALBs start with this
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+    
+    service:
+      port: 80
+      targetPort: http
+    
+    ingress:
+      subdomain: "admin"
+      internal:
+        enabled: true
+        # Auto-inherits /health from probe
+      external:
+        enabled: true
+        # Override for external with more thorough check
+        healthcheckPath: "/health/full"
+  
+  # Example 4: Worker without ingress (no healthcheck needed)
+  worker:
+    enabled: true
+    containers:
+      - name: worker
+        image:
+          repository: myorg/worker
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+    
+    generate:
+      service: false
+      ingress: false  # No ingress for workers
+      pdb: false
