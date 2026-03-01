@@ -89,6 +89,7 @@
 | [minio-console](stable/minio-console) | A management console for minio server and operator |
 | [modem-stats](stable/modem-stats) | periodic cable modem data collection and save the results to InfluxDB |
 | [monica](stable/monica) | A Personal Relationship Management tool to help you organize your social life |
+| [common-library-chart](stable/common-library-chart) | A Helm library chart providing reusable templates for Kubernetes resources. |
 | [mosquitto](stable/mosquitto) | Eclipse Mosquitto - An open source MQTT broker |
 | [mqtt-exporter](stable/mqtt-exporter) | Simple and generic Prometheus exporter for MQTT. Tested with Mosquitto MQTT and Xiaomi sensors. |
 | [multus](stable/multus) | multus CNI allows multiple NICs per pod |
