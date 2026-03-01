@@ -1,0 +1,15 @@
+apiVersion: v2
+name: jdownloader
+description: JDownloader 2 - Free download management tool with web GUI
+type: application
+version: 0.1.0
+appVersion: "latest"
+kubeVersion: ">=1.16.0-0"
+maintainers:
+  - name: mononen
+    email: alex@mononen.dev
+
+dependencies:
+  - name: mononen-library-chart
+    version: "1.0.0"
+    repository: "https://mononen.github.io/charts/"

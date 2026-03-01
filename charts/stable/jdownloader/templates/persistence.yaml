@@ -1,0 +1,45 @@
+{{- $persistence := .Values.persistence | default dict }}
+{{- $config := $persistence.config | default dict }}
+{{- $output := $persistence.output | default dict }}
+
+{{- if ($config.enabled | default false) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "jdownloader.pvc.config" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  accessModes:
+    {{- toYaml $config.accessModes | nindent 4 }}
+  {{- if $config.storageClass }}
+  storageClassName: {{ $config.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $config.size | default "1Gi" }}
+{{- end }}
+---
+{{- if ($output.enabled | default false) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "jdownloader.pvc.output" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  accessModes:
+    {{- toYaml $output.accessModes | nindent 4 }}
+  {{- if $output.storageClass }}
+  storageClassName: {{ $output.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $output.size | default "50Gi" }}
+{{- end }}

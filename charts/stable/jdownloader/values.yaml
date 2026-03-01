@@ -1,0 +1,141 @@
+global:
+  clientCode: mononen
+  project: jdownloader
+  env: dev
+  namespace: ""
+  domain: ""
+
+  # Disable default security context — jlesage container manages its own
+  # UID/GID via USER_ID and GROUP_ID environment variables
+  security:
+    enabled: false
+
+  imageDefaults:
+    registry: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+
+  resources:
+    deployments: true
+    services: true
+    hpas: true
+    pdbs: true
+    serviceaccounts: true
+    restartCronjobs: true
+    serviceMonitors: true
+    ingresses: true
+    configmaps: true
+    secrets: true
+    cronjobs: true
+    jobs: true
+
+persistence:
+  config:
+    enabled: true
+    claimName: jdownloader-config
+    storageClass: ""
+    size: 1Gi
+    accessModes:
+      - ReadWriteOnce
+  output:
+    enabled: true
+    claimName: jdownloader-output
+    storageClass: ""
+    size: 50Gi
+    accessModes:
+      - ReadWriteOnce
+
+components:
+  jdownloader:
+    enabled: true
+    primaryComponent: true
+    replicaCount: 1
+
+    generate:
+      deployment: true
+      service: true
+      hpa: false
+      pdb: false
+      serviceaccount: false
+      ingress: false
+      restartCronJob: false
+      serviceMonitor: false
+      logging: false
+      configmaps: false
+      secrets: false
+      cronjobs: false
+      jobs: false
+
+    containers:
+      - name: jdownloader
+        image:
+          repository: jlesage/jdownloader-2
+          tag: latest
+        ports:
+          - name: http
+            containerPort: 5800
+            protocol: TCP
+          - name: vnc
+            containerPort: 5900
+            protocol: TCP
+          - name: myjd
+            containerPort: 3129
+            protocol: TCP
+        env:
+          - name: TZ
+            value: "UTC"
+          - name: USER_ID
+            value: "1000"
+          - name: GROUP_ID
+            value: "1000"
+          - name: KEEP_APP_RUNNING
+            value: "1"
+          - name: DARK_MODE
+            value: "1"
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          - name: output
+            mountPath: /output
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 1Gi
+        startupProbe:
+          httpGet:
+            path: /
+            port: 5800
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5800
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5800
+          periodSeconds: 5
+
+    volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: jdownloader-config
+      - name: output
+        persistentVolumeClaim:
+          claimName: jdownloader-output
+
+    service:
+      type: ClusterIP
+      port: 5800
+      targetPort: 5800
+      additionalPorts:
+        - name: vnc
+          port: 5900
+          targetPort: 5900
+        - name: myjd
+          port: 3129
+          targetPort: 3129
