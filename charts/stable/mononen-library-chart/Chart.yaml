@@ -1,8 +1,8 @@
 apiVersion: v2
 name: mononen-library-chart
 description: A Helm library chart providing reusable templates for Kubernetes resources.
-type: library
-version: 1.0.0
+type: application
+version: 1.1.0
 appVersion: "1.0.0"
 keywords:
   - library
