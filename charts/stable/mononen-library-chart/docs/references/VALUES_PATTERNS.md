@@ -14,14 +14,11 @@ global:
   namespace: myorg
   domain: example.com
   
-  alb:
-    prefix: myorg  # Auto-generates ALB names
-  
   imageDefaults:
-    registry: registry.moslrn.net
+    registry: registry.example.com
     pullPolicy: IfNotPresent
     pullSecrets:
-      - name: harbor  # CRITICAL: MUST be 'harbor'
+      - name: regcred
 
 components:
   myapp:
@@ -66,15 +63,8 @@ global:
   
   # Networking
   domain: example.com         # Primary domain
-  certificateARN: ""          # AWS ACM certificate ARN (if using ALB)
   altDomain: ""               # Alternate domain (optional)
   domainOverride: ""          # Override computed FQDN (optional)
-  
-  # ALB Ingress Configuration
-  # Prefix for auto-generated ALB names (defaults to clientCode if not set)
-  # Example: prefix "ptsi" + env "dev" = "ptsi-dev-internal", "ptsi-dev-external"
-  alb:
-    prefix: myorg
   
   # Security (enabled by default)
   security:
@@ -91,18 +81,18 @@ global:
   
   # Image defaults
   imageDefaults:
-    registry: docker.io
+    registry: registry.example.com
     pullPolicy: IfNotPresent
     pullSecrets:
-      - name: harbor  # CRITICAL: MUST be 'harbor'
+      - name: regcred
   
-  # Logging - DO NOT SET THESE (infrastructure-managed defaults)
-  # logs:
-  #   lokiEndpoint: "https://logs.moslrn.net"  # DO NOT OVERRIDE
-  # logging:
-  #   image:
-  #     repository: registry.moslrn.net/dh/grafana/alloy  # DO NOT OVERRIDE
-  #     tag: v1.9.1                                        # DO NOT OVERRIDE
+  # Logging
+  logs:
+    lokiEndpoint: ""          # Set to your Loki endpoint (e.g., https://loki.example.com)
+  logging:
+    image:
+      repository: grafana/alloy
+      tag: v1.9.1
 
 ##################################
 #       COMPONENTS               #
@@ -192,28 +182,22 @@ components:
       additionalPorts: []
     
     # Ingress configuration
-    # IMPORTANT: loadBalancerName, groupName, and securityGroups are REQUIRED
-    # for each enabled ingress type. Always confirm these with the user.
     ingress:
+      className: ""           # ingressClassName (e.g., nginx, traefik)
       subdomain: ""           # Override subdomain (defaults to component name)
-      certificateARN: ""      # Override global certificate ARN
-      paths: []               # Custom path routing (defaults to / -> service)
+      annotations: {}         # Shared annotations for all ingress types
       internal:
         enabled: true
-        loadBalancerName: ""  # REQUIRED - e.g., "myorg-dev-internal"
-        groupName: ""         # REQUIRED - e.g., "myorg-dev-internal"
-        securityGroups: ""    # REQUIRED - e.g., "dev-alb-internal, myorg-dev-alb-internal"
-        groupOrder: "100"
-        healthcheckPath: ""   # Optional: override auto-inherited path from probes
-        annotations: {}
+        className: ""         # Override ingressClassName for this type
+        annotations: {}       # Per-type annotations (merged with shared)
+        paths: []             # Custom path routing (defaults to / -> service)
+        tls: []               # TLS configuration
       external:
         enabled: false
-        loadBalancerName: ""  # REQUIRED when enabled - e.g., "myorg-dev-external"
-        groupName: ""         # REQUIRED when enabled - e.g., "myorg-dev-external"
-        securityGroups: ""    # REQUIRED when enabled - e.g., "dev-alb-external, myorg-dev-alb-external"
-        groupOrder: "100"
-        healthcheckPath: ""   # Optional: override auto-inherited path from probes
+        className: ""
         annotations: {}
+        paths: []
+        tls: []
     
     # Autoscaling (generated when generate.hpa: true)
     autoscaling:
@@ -300,24 +284,14 @@ components:
     generate:
       deployment: true
       service: true
-      hpa: true
-      pdb: true
-      serviceaccount: true
-      ingress: true
-    replicaCount: 1
-    generate:
-      deployment: true
-      service: true
       hpa: false
       pdb: false
       serviceaccount: true
       ingress: true
+    replicaCount: 1
     ingress:
       internal:
         enabled: true
-        loadBalancerName: "sbx-internal"                           # REQUIRED - confirm with user
-        groupName: "sbx-internal"                                  # REQUIRED - confirm with user
-        securityGroups: "sbx-cluster-alb-internal"                 # REQUIRED - confirm with user
       external:
         enabled: false
 ```
@@ -345,14 +319,8 @@ components:
     ingress:
       internal:
         enabled: true
-        loadBalancerName: "myorg-prd-internal"                     # REQUIRED - confirm with user
-        groupName: "myorg-prd-internal"                            # REQUIRED - confirm with user
-        securityGroups: "prd-alb-internal, myorg-prd-alb-internal" # REQUIRED - confirm with user
       external:
         enabled: true
-        loadBalancerName: "myorg-prd-external"                     # REQUIRED - confirm with user
-        groupName: "myorg-prd-external"                            # REQUIRED - confirm with user
-        securityGroups: "prd-alb-external, myorg-prd-alb-external" # REQUIRED - confirm with user
 ```
 
 ## Ingress Host Configuration
@@ -380,11 +348,9 @@ components:
       serviceaccount: true
       ingress: true
     ingress:
+      className: nginx
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"
-        groupName: "myorg-dev-internal"
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal"
   # Host: api.dev.example.com
 
   # Custom subdomain
@@ -397,17 +363,12 @@ components:
       serviceaccount: true
       ingress: true
     ingress:
+      className: nginx
       subdomain: "app"
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"
-        groupName: "myorg-dev-internal"
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal"
       external:
         enabled: true
-        loadBalancerName: "myorg-dev-external"
-        groupName: "myorg-dev-external"
-        securityGroups: "dev-alb-external, myorg-dev-alb-external"
   # Host: app.dev.example.com
 
   # Another custom subdomain
@@ -420,12 +381,10 @@ components:
       serviceaccount: true
       ingress: true
     ingress:
+      className: nginx
       subdomain: "admin-portal"
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"
-        groupName: "myorg-dev-internal"
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal"
   # Host: admin-portal.dev.example.com
 ```
 

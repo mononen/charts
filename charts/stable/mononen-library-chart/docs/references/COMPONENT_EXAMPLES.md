@@ -559,8 +559,6 @@ components:
 
 ## Ingress Configuration
 
-> **CRITICAL**: Do NOT auto-generate or guess ingress ALB values. Always confirm `loadBalancerName`, `groupName`, and `securityGroups` with the user. These are environment and infrastructure specific.
-
 ### Basic Ingress (Internal Only)
 
 ```yaml
@@ -574,12 +572,9 @@ components:
       serviceaccount: true
       ingress: true
     ingress:
+      className: nginx
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-internal"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal" # REQUIRED - confirm with user
-        groupOrder: "100"
 ```
 
 Host: `api.{env}.{domain}` (e.g., `api.dev.example.com`)
@@ -597,12 +592,10 @@ components:
       serviceaccount: true
       ingress: true
     ingress:
+      className: nginx
       subdomain: "app"         # Override default (component name)
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-internal"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal" # REQUIRED - confirm with user
 ```
 
 Host: `app.{env}.{domain}` (e.g., `app.dev.example.com`)
@@ -620,24 +613,19 @@ components:
       serviceaccount: true
       ingress: true
     ingress:
+      className: nginx
       subdomain: "api"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-internal"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal" # REQUIRED - confirm with user
-        groupOrder: "100"
       external:
         enabled: true
-        loadBalancerName: "myorg-dev-external"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-external"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-external, myorg-dev-alb-external" # REQUIRED - confirm with user
-        groupOrder: "100"
 ```
 
 Creates two Ingress resources:
-- `{release}-api-internal` → Internal ALB
-- `{release}-api-external` → External ALB (internet-facing)
+- `{release}-api-internal` → Internal ingress
+- `{release}-api-external` → External ingress (internet-facing)
 
 ### Custom Path Routing
 
@@ -652,21 +640,19 @@ components:
       serviceaccount: true
       ingress: true
     ingress:
+      className: nginx
       subdomain: "api"
-      paths:
-        - path: /v1
-          pathType: Prefix
-          serviceName: api-v1
-          servicePort: 80
-        - path: /v2
-          pathType: Prefix
-          serviceName: api-v2
-          servicePort: 80
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-internal"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal" # REQUIRED - confirm with user
+        paths:
+          - path: /v1
+            pathType: Prefix
+            serviceName: api-v1
+            servicePort: 80
+          - path: /v2
+            pathType: Prefix
+            serviceName: api-v2
+            servicePort: 80
 ```
 
 ### Disable Ingress for Component
@@ -683,7 +669,7 @@ components:
       ingress: false           # No ingress generated
 ```
 
-### Explicit ALB Settings
+### Per-Type Annotations
 
 ```yaml
 components:
@@ -696,13 +682,16 @@ components:
       serviceaccount: true
       ingress: true
     ingress:
+      className: nginx
       subdomain: "special"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
       internal:
         enabled: true
-        loadBalancerName: "custom-alb-internal"                    # REQUIRED - confirm with user
-        groupName: "custom-group"                                  # REQUIRED - confirm with user
-        securityGroups: "custom-sg-1, custom-sg-2"                 # REQUIRED - confirm with user
-        healthcheckPath: "/health"
+      external:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
 ```
 
 ## Multiple Components
@@ -729,17 +718,12 @@ components:
     service:
       port: 80
     ingress:
+      className: nginx
       subdomain: "api"         # Host: api.{env}.{domain}
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-internal"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal" # REQUIRED - confirm with user
       external:
         enabled: true
-        loadBalancerName: "myorg-dev-external"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-external"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-external, myorg-dev-alb-external" # REQUIRED - confirm with user
 
   frontend:
     enabled: true
@@ -760,17 +744,12 @@ components:
     service:
       port: 80
     ingress:
+      className: nginx
       subdomain: "app"         # Host: app.{env}.{domain}
       internal:
         enabled: true
-        loadBalancerName: "myorg-dev-internal"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-internal"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-internal, myorg-dev-alb-internal" # REQUIRED - confirm with user
       external:
         enabled: true
-        loadBalancerName: "myorg-dev-external"                     # REQUIRED - confirm with user
-        groupName: "myorg-dev-external"                            # REQUIRED - confirm with user
-        securityGroups: "dev-alb-external, myorg-dev-alb-external" # REQUIRED - confirm with user
 
   worker:
     enabled: true

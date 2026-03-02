@@ -2,11 +2,11 @@
 
 **Purpose:** Configuration guide for adding logging sidecars using Alloy to ship logs to Loki.
 
-> ⚠️ **INFRASTRUCTURE-MANAGED SETTINGS**
+> **Global Configuration**
 >
-> DO NOT override the following settings - they are centrally managed:
-> - Sidecar image: `registry.moslrn.net/dh/grafana/alloy:v1.9.1`
-> - Loki endpoint: `https://logs.moslrn.net`
+> The following settings are configured globally and shared across all components:
+> - Sidecar image: `grafana/alloy:v1.9.1` (via `global.logging.image`)
+> - Loki endpoint: configured via `global.logs.lokiEndpoint`
 > - Auth secret: `loki-auth`
 
 ## Basic Configuration
@@ -139,12 +139,12 @@ components:
 
 ## Sidecar Defaults
 
-These values are set by infrastructure and should NOT be overridden:
+These values are configured globally:
 
 | Setting | Value |
 |---------|-------|
-| Image | `registry.moslrn.net/dh/grafana/alloy:v1.9.1` |
-| Loki Endpoint | `https://logs.moslrn.net` |
+| Image | `grafana/alloy:v1.9.1` |
+| Loki Endpoint | Configured via `global.logs.lokiEndpoint` |
 | Auth Secret | `loki-auth` |
 | Memory Limit | `256Mi` |
 | CPU Request | `50m` |
@@ -156,6 +156,8 @@ These values are set by infrastructure and should NOT be overridden:
 global:
   clientCode: myorg
   project: myapp
+  logs:
+    lokiEndpoint: "https://loki.example.com"
 
 components:
   api:
@@ -224,14 +226,14 @@ LOG_FILE=/var/log/api/application.log
 ### Sidecar Not Starting
 
 1. **Check auth secret:** Verify `loki-auth` secret exists in namespace
-2. **Check image pull:** Verify access to `registry.moslrn.net`
+2. **Check image pull:** Verify the sidecar image is accessible from your cluster
 
 ### High Memory Usage
 
 The sidecar is limited to 256Mi. If processing high-volume logs:
 1. Consider reducing log verbosity
 2. Split logs across multiple targets
-3. Contact infrastructure team for tuning
+3. Override resource limits in component logging config
 
 ## Labels Added to Logs
 

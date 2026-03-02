@@ -96,9 +96,9 @@ components:
     primaryComponent: true  # Resources named without component suffix
 ```
 
-## ALB/Ingress Issues
+## Ingress Issues
 
-### Wrong ALB Names in Different Environments
+### Wrong Ingress Hosts in Different Environments
 
 ```
 Expected: myorg-prd-internal
@@ -115,35 +115,19 @@ global:
   env: prd  # MUST match environment
 ```
 
-### Missing Security Groups
+### Missing Ingress Class
 
 ```
-ERROR: Security group not found
+ERROR: Ingress does not have an IngressClass
 ```
 
-**Cause:** Auto-generated security groups don't exist in AWS.
-
-**Solution:** Override with existing security groups:
+**Solution:** Set the ingress class for your controller:
 
 ```yaml
 components:
   myapp:
     ingress:
-      internal:
-        securityGroups: "existing-sg-1, existing-sg-2"
-```
-
-### Certificate ARN Not Set
-
-```
-ERROR: Certificate ARN is empty
-```
-
-**Solution:** Set certificate ARN in global config:
-
-```yaml
-global:
-  certificateARN: "arn:aws:acm:region:account:certificate/id"
+      className: nginx  # or traefik, etc.
 ```
 
 ## Values File Issues
@@ -173,15 +157,15 @@ components:
 ERROR: ErrImagePull - unauthorized
 ```
 
-**Cause:** Image pull secret not named `harbor`.
+**Cause:** Image pull secret name doesn't match what's configured in the cluster.
 
-**Solution:** Ensure pull secret is named exactly `harbor`:
+**Solution:** Ensure pull secret name matches your registry credentials:
 
 ```yaml
 global:
   imageDefaults:
     pullSecrets:
-      - name: harbor  # MUST be 'harbor', not 'registry-secret'
+      - name: regcred  # Must match the secret name in your namespace
 ```
 
 ### Wrong Image Tag
@@ -212,9 +196,9 @@ ERROR: failed to locate chart
 1. Verify Chart.yaml has correct dependency:
    ```yaml
    dependencies:
-     - name: common-library-chart
+     - name: mononen-library-chart
        version: "1.0.0"
-       repository: "oci://registry.moslrn.net/library/charts"
+       repository: "https://mononen.github.io/charts/"
    ```
 
 2. Run dependency update:
@@ -306,7 +290,7 @@ kubectl apply --dry-run=server -f rendered.yaml
 | Nil pointer | Missing `default dict` | Add `\| default dict` |
 | No resources | `enabled: false` | Set `enabled: true` |
 | Double suffix | Missing primaryComponent | Add `primaryComponent: true` |
-| Wrong ALB names | Wrong `global.env` | Check env config files |
-| Image pull fails | Wrong secret name | Use `harbor` not custom name |
+| Wrong ingress hosts | Wrong `global.env` | Check env config files |
+| Image pull fails | Wrong secret name | Check `pullSecrets` name matches cluster secret |
 | Config lost | Array override | Never override `containers[]` |
 | Chart not found | Missing dependency | Run `helm dependency update` |

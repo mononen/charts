@@ -6,21 +6,13 @@ A Helm library chart providing reusable templates for Kubernetes resources.
 
 ## Installation
 
-> ⚠️ **CRITICAL: Registry Configuration**
->
-> The common-library-chart MUST be pulled from the OCI registry:
-> ```
-> oci://registry.moslrn.net/library/charts
-> ```
-> This is the **ONLY** supported registry. Do NOT use file paths or HTTP registry URLs.
-
 Add as a dependency in your `Chart.yaml`:
 
 ```yaml
 dependencies:
-  - name: common-library-chart
-    version: "1.0.0"  # Use latest version from OCI registry
-    repository: "oci://registry.moslrn.net/library/charts"
+  - name: mononen-library-chart
+    version: "1.0.0"
+    repository: "https://mononen.github.io/charts/"
 ```
 
 ### Using the Library Chart
@@ -28,9 +20,9 @@ dependencies:
 1. **Add the dependency** to your `Chart.yaml`:
    ```yaml
    dependencies:
-     - name: common-library-chart
+     - name: mononen-library-chart
        version: "1.0.0"
-       repository: "oci://registry.moslrn.net/library/charts"
+       repository: "https://mononen.github.io/charts/"
    ```
 
 2. **Update dependencies**:
@@ -51,8 +43,6 @@ The library chart uses **git tag-based versioning**. Versions are explicitly con
 # Create a release tag
 git tag v1.0.5
 git push origin v1.0.5
-
-# Pipeline automatically extracts version and publishes to OCI registry
 ```
 
 **Semantic Versioning:**
@@ -63,12 +53,8 @@ git push origin v1.0.5
 **Key Points:**
 - Only tagged commits are released
 - Tag format: `vX.Y.Z` or `X.Y.Z` (v prefix optional)
-- Pipeline fails if no tag exists on commit
-- See [Git Tag Versioning Guide](./docs/GIT_TAG_VERSIONING.md) for details
 
-Always check the [OCI registry](https://registry.moslrn.net/harbor/projects/library/repositories/charts%2Fcommon-library-chart) for available versions.
-
-## ALB Ingress Configuration
+## Ingress Configuration
 
 ### Host Name Generation
 
@@ -99,26 +85,44 @@ Ingresses are created when:
 3. `generate.ingress` is not `false`
 4. Internal (default: enabled) or external (default: disabled) is enabled
 
-### Auto-Generated ALB Names
+### Ingress Class and Annotations
 
-ALB names are **auto-generated** from a **prefix** and the **environment**:
+The `className` and `annotations` fields let you configure ingress for any controller (nginx, traefik, ALB, etc.):
 
 ```yaml
 global:
   clientCode: myorg
   env: dev
-  
-  # Set the prefix for ALB names (defaults to clientCode if not set)
-  alb:
-    prefix: myorg
+
+components:
+  api:
+    ingress:
+      className: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      internal:
+        enabled: true
+      external:
+        enabled: false
 ```
 
-This generates:
-| Setting | Internal | External |
-|---------|----------|----------|
-| loadBalancerName | `myorg-dev-internal` | `myorg-dev-external` |
-| groupName | `myorg-dev-internal` | `myorg-dev-external` |
-| securityGroups | `govcloud-dev-alb-internal, myorg-dev-alb-internal` | `govcloud-dev-alb-external, myorg-dev-alb-external` |
+Shared `className` and `annotations` at the ingress level apply to both internal and external. Per-type overrides take precedence:
+
+```yaml
+components:
+  api:
+    ingress:
+      className: nginx              # Default for both
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      internal:
+        enabled: true
+      external:
+        enabled: true
+        className: nginx-external    # Override for external only
+        annotations:                 # Merged with shared annotations
+          nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
+```
 
 ### Per-Ingress Override
 
@@ -131,23 +135,17 @@ components:
       subdomain: "backend"       # Custom subdomain (default: component name)
       internal:
         enabled: true
-        groupOrder: "100"
-        # Optional ALB overrides (normally auto-generated):
-        # loadBalancerName: "custom-alb-name"
-        # groupName: "custom-group"
-        # securityGroups: "custom-sg-1, custom-sg-2"
       external:
         enabled: false
 ```
 
 ### Pattern Summary
 
-| Setting | Auto-Generated Pattern |
-|---------|------------------------|
+| Setting | Pattern |
+|---------|---------|
 | `host` | `{subdomain}.{env}.{domain}` or `{subdomain}.{domain}` (prd) |
-| `loadBalancerName` | `{prefix}-{env}-internal` or `{prefix}-{env}-external` |
-| `groupName` | `{prefix}-{env}-internal` or `{prefix}-{env}-external` |
-| `securityGroups` | `govcloud-{env}-alb-{scheme}, {prefix}-{env}-alb-{scheme}` |
+| `className` | Set per-component or per-type |
+| `annotations` | Shared + per-type (merged) |
 
 ## Quick Start
 
@@ -160,18 +158,12 @@ global:
   env: dev
   namespace: myorg
   domain: example.com
-  certificateARN: "arn:aws:acm:..."
-  
-  # ALB prefix (defaults to clientCode)
-  alb:
-    prefix: myorg
-  
-  # Image defaults - MUST use 'harbor' for pullSecrets
+
   imageDefaults:
-    registry: registry.moslrn.net
+    registry: registry.example.com
     pullPolicy: IfNotPresent
     pullSecrets:
-      - name: harbor  # CRITICAL: Must be 'harbor', not 'registry-secret'
+      - name: regcred
 
 components:
   api:
@@ -187,26 +179,15 @@ components:
     service:
       port: 80
     
-    # Ingress config - host and ALB settings auto-generated
     ingress:
-      subdomain: ""            # Defaults to component name ("api")
+      className: nginx
       internal:
-        enabled: true          # Internal ALB (enabled by default)
-        groupOrder: "100"
+        enabled: true
       external:
-        enabled: false         # External ALB (disabled by default)
+        enabled: false
 ```
 
-## ⚠️ Critical: Image Configuration
-
-### Image Pull Secret Must Be 'harbor'
-
-```yaml
-global:
-  imageDefaults:
-    pullSecrets:
-      - name: harbor  # NOT 'registry-secret' - MUST be 'harbor'
-```
+## Image Configuration
 
 ### Image Tags Are Set During Deployment
 
@@ -224,7 +205,7 @@ containers:
       tag: ""  # Falls back to global.imageDefaults.tag or Chart.AppVersion
 ```
 
-## ⚠️ Critical: Helm Array Merging
+## Helm Array Merging
 
 Helm REPLACES arrays entirely - it does NOT merge them. **NEVER override the `containers` array in environment-specific config files!**
 
@@ -256,34 +237,16 @@ components:
 {{- include "common.all" . }}
 ```
 
-## Helper Templates
-
-### ALB Annotation Helpers
-
-```yaml
-# Internal ALB annotations
-{{- include "ingress.alb.internal" (dict "global" $global "config" $internal "certificateARN" $certARN) }}
-
-# External ALB annotations  
-{{- include "ingress.alb.external" (dict "global" $global "config" $external "certificateARN" $certARN) }}
-```
-
-Parameters:
-- `global`: Pass `.Values.global` for auto-generation
-- `config`: Per-ingress config with `groupOrder` and optional overrides
-- `certificateARN`: ACM certificate ARN
-
 ## Environment Overrides
 
-No need to repeat ALB settings per environment - they're auto-generated:
+No need to repeat ingress settings per environment - they follow `global.env`:
 
 ```yaml
 # config/prd.yaml
 global:
   env: prd
-  certificateARN: "arn:aws:acm:...prod-cert..."
 
-# That's it! ALB names become ptsi-prd-internal/external automatically
+# That's it! Host names become {subdomain}.{domain} automatically (no env prefix)
 ```
 
 Override only if you need different values:
@@ -294,7 +257,8 @@ components:
   api:
     ingress:
       internal:
-        loadBalancerName: "special-alb"  # Override just this one
+        annotations:
+          custom-annotation: "special-value"
 ```
 
 ## Logging (Alloy/Loki Sidecar)
@@ -330,23 +294,32 @@ This automatically:
 3. Creates emptyDir volumes for log files
 4. Mounts the Loki auth secret for authentication
 
+### Global Logging Configuration
+
+Configure the logging infrastructure globally:
+
+```yaml
+global:
+  logs:
+    lokiEndpoint: "https://loki.example.com"
+  
+  logging:
+    image:
+      repository: grafana/alloy
+      tag: v1.9.1
+```
+
 ### Sidecar Defaults
 
-> ⚠️ **DO NOT OVERRIDE** these defaults unless explicitly instructed by the DevOps team.
-> The image, endpoint, and auth secret are centrally managed to ensure compatibility
-> with the organization's logging infrastructure.
-
-| Setting | Default Value | Override? |
-|---------|---------------|-----------|
-| **Image** | `registry.moslrn.net/dh/grafana/alloy:v1.9.1` | **NO** - centrally managed |
-| **Loki Endpoint** | `https://logs.moslrn.net` | **NO** - centrally managed |
-| **Loki Auth Secret** | `loki-auth` | **NO** - cluster-provided |
-| CPU Request | `50m` | Only if necessary |
-| Memory Request | `64Mi` | Only if necessary |
-| Memory Limit | `256Mi` | Only if necessary |
-| Security Context | `runAsGroup: 473` | Only if necessary |
-
-The image and endpoint are configured globally and should **never** be overridden in application charts. These are managed centrally to ensure all applications use compatible, tested versions and connect to the correct logging infrastructure.
+| Setting | Default Value |
+|---------|---------------|
+| **Image** | `grafana/alloy:v1.9.1` |
+| **Loki Endpoint** | Must be configured via `global.logs.lokiEndpoint` |
+| **Loki Auth Secret** | `loki-auth` |
+| CPU Request | `50m` |
+| Memory Request | `64Mi` |
+| Memory Limit | `256Mi` |
+| Security Context | `runAsGroup: 473` |
 
 ### What You CAN Configure
 
@@ -398,22 +371,6 @@ Use `{{ include "common.logging.alloy-header" . }}` to include the standard Loki
 | `jobs[].multilinePattern` | Optional regex for multiline logs |
 | `jobs[].dropPattern` | Optional regex to drop matching lines |
 
-### Global Logging Defaults (DO NOT MODIFY)
-
-These values are set at the infrastructure level and should **not** be overridden in application charts:
-
-```yaml
-# These are infrastructure defaults - DO NOT set in your values.yaml
-global:
-  logs:
-    lokiEndpoint: "https://logs.moslrn.net"  # DO NOT OVERRIDE
-  
-  logging:
-    image:
-      repository: registry.moslrn.net/dh/grafana/alloy  # DO NOT OVERRIDE
-      tag: v1.9.1                                        # DO NOT OVERRIDE
-```
-
 ## Generated Resources
 
 The library generates the following resources per component:
@@ -456,5 +413,4 @@ components:
 
 ## Documentation
 
-- [AI New Project Guide](docs/AI_NEW_PROJECT_GUIDE.md) - Creating new projects
-- [AI Migration Guide](docs/AI_MIGRATION_GUIDE.md) - Migrating existing charts
+- [Docs Index](docs/README.md) - Skills and reference materials

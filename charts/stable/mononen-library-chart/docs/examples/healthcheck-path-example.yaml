@@ -1,9 +1,9 @@
-# Example: ALB Healthcheck Path - Automatic Inheritance and Manual Override
+# Example: Ingress with Probes
 #
 # This example demonstrates:
-# 1. Automatic inheritance from container probes (recommended)
-# 2. Manual override when needed
-# 3. Different paths for internal vs external ALBs
+# 1. Components with health probes configured
+# 2. Internal and external ingress configuration
+# 3. Custom annotations per ingress type
 
 global:
   clientCode: myorg
@@ -11,19 +11,15 @@ global:
   env: dev
   namespace: myorg
   domain: example.com
-  certificateARN: "arn:aws:acm:us-east-1:123456789012:certificate/abc-123"
-  
-  alb:
-    prefix: myorg  # Auto-generates ALB names
   
   imageDefaults:
-    registry: registry.moslrn.net
+    registry: registry.example.com
     pullPolicy: IfNotPresent
     pullSecrets:
-      - name: harbor
+      - name: regcred
 
 components:
-  # Example 1: Automatic inheritance (recommended - no manual config needed!)
+  # Example 1: Basic internal ingress with probes
   api:
     enabled: true
     containers:
@@ -37,10 +33,9 @@ components:
           limits:
             cpu: 500m
             memory: 512Mi
-        # ALB automatically inherits from readinessProbe!
         readinessProbe:
           httpGet:
-            path: /health      # ← ALB automatically uses this
+            path: /health
             port: http
           periodSeconds: 5
         livenessProbe:
@@ -54,15 +49,14 @@ components:
       targetPort: http
     
     ingress:
+      className: nginx
       subdomain: "api"
       internal:
         enabled: true
-        # No healthcheckPath needed - auto-inherited from readinessProbe!
       external:
         enabled: true
-        # Also auto-inherited for external
   
-  # Example 2: Manual override - different paths for ALB vs K8s probes
+  # Example 2: Custom annotations per ingress type
   frontend:
     enabled: true
     containers:
@@ -76,7 +70,6 @@ components:
           limits:
             cpu: 500m
             memory: 512Mi
-        # K8s uses /ready for pod readiness
         readinessProbe:
           httpGet:
             path: /ready
@@ -91,17 +84,18 @@ components:
       targetPort: http
     
     ingress:
+      className: nginx
       subdomain: "app"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
       internal:
         enabled: true
-        # Override: ALB uses lighter endpoint than K8s
-        healthcheckPath: "/healthz"
       external:
         enabled: true
-        # Different check for external traffic
-        healthcheckPath: "/health/external"
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
   
-  # Example 3: Only internal ALB inherits, external overrides
+  # Example 3: Internal only with custom subdomain
   admin:
     enabled: true
     containers:
@@ -115,7 +109,6 @@ components:
           limits:
             cpu: 500m
             memory: 512Mi
-        # Both ALBs start with this
         readinessProbe:
           httpGet:
             path: /health
@@ -126,16 +119,14 @@ components:
       targetPort: http
     
     ingress:
+      className: nginx
       subdomain: "admin"
       internal:
         enabled: true
-        # Auto-inherits /health from probe
       external:
-        enabled: true
-        # Override for external with more thorough check
-        healthcheckPath: "/health/full"
+        enabled: false
   
-  # Example 4: Worker without ingress (no healthcheck needed)
+  # Example 4: Worker without ingress
   worker:
     enabled: true
     containers:

@@ -1,6 +1,6 @@
 ---
 name: migrate-helm-chart
-description: Migrate existing Helm charts to use the common-library-chart. Restructures values.yaml, adds library dependency, updates templates, and implements ALB auto-generation.
+description: Migrate existing Helm charts to use the common-library-chart. Restructures values.yaml, adds library dependency, updates templates, and configures ingress.
 ---
 
 # Migrate Existing Helm Chart to Common Library
@@ -15,12 +15,10 @@ Edit `Chart.yaml`:
 
 ```yaml
 dependencies:
-  - name: common-library-chart
+  - name: mononen-library-chart
     version: "1.0.0"
-    repository: "oci://registry.moslrn.net/library/charts"
+    repository: "https://mononen.github.io/charts/"
 ```
-
-> **CRITICAL**: Only use the OCI registry URL shown above.
 
 ### 2. Restructure values.yaml
 
@@ -43,11 +41,9 @@ global:
   project: myapp
   env: dev
   namespace: myorg
-  alb:
-    prefix: myorg
   imageDefaults:
     pullSecrets:
-      - name: harbor
+      - name: regcred
 
 components:
   myapp:
@@ -82,24 +78,23 @@ Create `templates/resources.yaml`:
 | `.Values.networking.domain` | `.Values.global.domain` |
 | `.Values.myapp.*` | `.Values.components.myapp.*` |
 
-### 5. Add ALB Helpers & Discover Ingress Values
+### 5. Migrate Ingress Configuration
 
-Copy helpers from `references/ALB_INGRESS_CONFIG.md` to `_helpers.tpl`.
+If the existing chart has custom ingress templates with annotations, move the annotations into values:
 
-Update ingress templates to use helpers:
 ```yaml
-annotations:
-  {{- include "ingress.alb.internal" (dict "global" $global "config" $internal "certificateARN" $global.certificateARN) | nindent 4 }}
+components:
+  myapp:
+    ingress:
+      className: nginx
+      annotations:
+        # Move existing annotations here
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      internal:
+        enabled: true
+      external:
+        enabled: false
 ```
-
-**Discover ALB ingress values from the target cluster** using the Kubernetes MCP tool instead of asking the user to provide them:
-1. Use `configuration_contexts_list` to find the target cluster context
-2. Use `resources_list` (apiVersion: `networking.k8s.io/v1`, kind: `Ingress`) to list existing ingresses
-3. Extract unique `load-balancer-name` values, grouped by `scheme` (internal vs internet-facing)
-4. Prompt the user to select which LB to use, then pull `groupName` and `securityGroups` from a matching ingress
-5. For production: prompt which components need external ingress. Lower environments default to internal-only.
-
-See `references/ALB_INGRESS_CONFIG.md` for the full discovery procedure.
 
 ### 6. Delete Redundant Templates
 
@@ -125,9 +120,8 @@ kubectl apply --dry-run=client -f rendered.yaml
 
 | Area | Change |
 |------|--------|
-| Value paths | Flat → `global.*` and `components.*` |
-| Image pull secret | Must be named `harbor` |
-| ALB annotations | Use helper macros with auto-generation |
+| Value paths | Flat to `global.*` and `components.*` |
+| Ingress | Custom templates to library-generated with `className` + `annotations` |
 | Resource generation | Controlled by `generate.*` flags |
 | Primary component | Add `primaryComponent: true` to avoid double suffix |
 
@@ -139,7 +133,7 @@ See `references/TROUBLESHOOTING_CHARTS.md`:
 - **Nil pointer** - Add `| default dict` for nested values
 - **Resources not generating** - Check `enabled: true`
 - **Double component suffix** - Add `primaryComponent: true`
-- **Wrong ALB names** - Check `global.env` in env configs
+- **Wrong ingress hosts** - Check `global.env` in env configs
 
 ## Migration Checklist
 
@@ -153,7 +147,7 @@ See `references/TROUBLESHOOTING_CHARTS.md`:
 - [ ] Restructure values.yaml
 - [ ] Create resources.yaml entry point
 - [ ] Update template value references
-- [ ] Add ALB annotation helpers
+- [ ] Migrate ingress annotations to values
 - [ ] Delete redundant templates
 
 **Validation:**
@@ -186,5 +180,5 @@ components:
 
 - `references/VALUES_PATTERNS.md` - Complete values.yaml structure
 - `references/COMPONENT_EXAMPLES.md` - Configuration patterns
-- `references/ALB_INGRESS_CONFIG.md` - Ingress helpers
+- `references/INGRESS_CONFIG.md` - Ingress configuration
 - `references/TROUBLESHOOTING_CHARTS.md` - Issue resolution

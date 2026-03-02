@@ -9,64 +9,9 @@ Use this skill when making **incremental changes** to an existing Helm chart usi
 
 > **CRITICAL**: Every component MUST include an explicit `generate` block listing all resource types (`deployment`, `service`, `hpa`, `pdb`, `serviceaccount`, `ingress`), even when all values are `true` (the defaults). This makes the chart self-documenting and prevents surprises. When adding or modifying any component, always include or preserve the `generate` block.
 
-> **CRITICAL**: Do NOT guess or invent ingress ALB values. When a component has ingress enabled, you MUST discover the 3 required values (`loadBalancerName`, `groupName`, `securityGroups`) from existing ingresses in the target cluster using the Kubernetes MCP tool. See the **Ingress Value Discovery** section below for the full procedure.
-
 ## Recipes
 
-### Set Custom ALB Healthcheck Path
-
-**By default, the ALB healthcheck path is automatically inherited from your container probes!**
-
-```yaml
-components:
-  myapp:
-    containers:
-      - name: myapp
-        readinessProbe:
-          httpGet:
-            path: /health    # ← ALB automatically uses this!
-            port: http
-    
-    ingress:
-      internal:
-        enabled: true
-        # No healthcheckPath needed - auto-inherited from probe!
-```
-
-**Manual override when needed:**
-
-```yaml
-components:
-  myapp:
-    containers:
-      - name: myapp
-        readinessProbe:
-          httpGet:
-            path: /ready     # K8s uses this
-            port: http
-    
-    ingress:
-      internal:
-        enabled: true
-        healthcheckPath: "/health"     # ALB uses this instead
-      external:
-        enabled: true
-        healthcheckPath: "/api/health" # Different for external
-```
-
-**Priority:**
-1. Manual `healthcheckPath` (override)
-2. Auto-inherited from `readinessProbe` or `livenessProbe`
-3. Not set (ALB uses default traffic path)
-
-**When to use manual override:**
-- Different paths needed for internal vs external ALBs
-- ALB needs different endpoint than K8s probes
-- Container uses non-httpGet probes (tcpSocket, exec)
-
-### Add Another Ingress
-
-> **REMINDER**: Discover `loadBalancerName`, `groupName`, and `securityGroups` from existing ingresses in the target cluster using the Kubernetes MCP tool. See the **Ingress Value Discovery** section below. Never invent these values.
+### Add an Ingress
 
 **Basic internal ingress:**
 
@@ -74,12 +19,9 @@ components:
 components:
   myapp:
     ingress:
+      className: nginx
       internal:
         enabled: true
-        loadBalancerName: "discovered-from-cluster"
-        groupName: "discovered-from-cluster"
-        securityGroups: "discovered-from-cluster"
-        groupOrder: "100"
 ```
 
 Host: `myapp.{env}.{domain}` (uses component name as subdomain)
@@ -90,13 +32,10 @@ Host: `myapp.{env}.{domain}` (uses component name as subdomain)
 components:
   myapp:
     ingress:
+      className: nginx
       subdomain: "api"       # Override default subdomain
       internal:
         enabled: true
-        loadBalancerName: "discovered-from-cluster"
-        groupName: "discovered-from-cluster"
-        securityGroups: "discovered-from-cluster"
-        groupOrder: "100"
 ```
 
 Host: `api.{env}.{domain}` (e.g., `api.dev.example.com`)
@@ -107,19 +46,16 @@ Host: `api.{env}.{domain}` (e.g., `api.dev.example.com`)
 components:
   myapp:
     ingress:
-      subdomain: "app"       # Custom subdomain
+      className: nginx
+      subdomain: "app"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
       internal:
         enabled: true
-        loadBalancerName: "discovered-internal-lb"
-        groupName: "discovered-internal-group"
-        securityGroups: "discovered-internal-sgs"
-        groupOrder: "100"
       external:
         enabled: true
-        loadBalancerName: "discovered-external-lb"
-        groupName: "discovered-external-group"
-        securityGroups: "discovered-external-sgs"
-        groupOrder: "100"
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
 ```
 
 Creates both internal and external ingresses at `app.{env}.{domain}`
@@ -133,7 +69,7 @@ components:
       ingress: false         # No ingress generated for workers
 ```
 
-See `references/ALB_INGRESS_CONFIG.md` for complete ALB annotation patterns and ingress generation details.
+See `references/INGRESS_CONFIG.md` for complete ingress patterns and host generation details.
 
 ### Add a Sidecar Container
 
@@ -436,8 +372,6 @@ components:
       logging: true
 ```
 
-> **WARNING**: Do NOT override `global.logs.lokiEndpoint` or `global.logging.image` - these are infrastructure-managed defaults.
-
 See `references/LOGGING_SIDECARS.md` for Alloy/Loki configuration details.
 
 ### Add ServiceMonitor for Prometheus
@@ -555,47 +489,6 @@ components:
       ingress: false           # No ingress needed
 ```
 
-## Ingress Value Discovery (via Kubernetes MCP)
-
-When adding or modifying ingress configuration, discover ALB parameters from existing ingresses in the target cluster instead of asking the user to provide them manually.
-
-### Procedure
-
-1. **List available cluster contexts:**
-   ```
-   CallMcpTool:
-     server: user-kubernetes-mcp-server
-     toolName: configuration_contexts_list
-   ```
-   Cross-reference with `global-config.yml` to identify which context corresponds to the project's target cluster.
-
-2. **List ingresses in the target cluster:**
-   ```
-   CallMcpTool:
-     server: user-kubernetes-mcp-server
-     toolName: resources_list
-     arguments:
-       apiVersion: networking.k8s.io/v1
-       kind: Ingress
-       context: <cluster-context>
-   ```
-
-3. **Extract unique load balancer names** from `alb.ingress.kubernetes.io/load-balancer-name` annotations. Group by `alb.ingress.kubernetes.io/scheme` (`internal` vs `internet-facing`). There are multiple LBs per cluster, each with different purposes.
-
-4. **Prompt the user** to select which load balancer to use for this project's internal ingress (and external, if applicable).
-
-5. **Fetch a matching ingress** using `resources_get` and extract the full set of values:
-   - `loadBalancerName` from `alb.ingress.kubernetes.io/load-balancer-name`
-   - `groupName` from `alb.ingress.kubernetes.io/group.name`
-   - `securityGroups` from `alb.ingress.kubernetes.io/security-groups`
-
-6. **Repeat for each environment's cluster** if they differ (e.g., govcloud-int vs govcloud-prd).
-
-### External Ingress Defaults
-
-- **Lower environments (sbx, int, stg):** Default to internal-only ingress. Do not enable external ingress unless the user explicitly requests it.
-- **Production (prd):** Prompt the user: "Which components/services need to be exposed externally (internet-facing) on production?" Enable external ingress only for those components in `prd.yaml`.
-
 ## Validation
 
 After modifying values.yaml:
@@ -616,12 +509,12 @@ See `references/TROUBLESHOOTING_CHARTS.md` for detailed solutions:
 - **Template not found** - Check _helpers.tpl exists
 - **Nil pointer** - Add `| default dict` for nested values
 - **Resources not generating** - Check `generate` block flags are set to `true`
-- **Wrong ALB names** - Verify `global.env` is set in env configs
+- **Wrong ingress hosts** - Verify `global.env` is set in env configs
 
 ## Related References
 
 - `references/COMPONENT_EXAMPLES.md` - Multi-container, storage, secrets, CronJobs
-- `references/ALB_INGRESS_CONFIG.md` - Ingress annotation helpers
+- `references/INGRESS_CONFIG.md` - Ingress configuration and host generation
 - `references/VALUES_PATTERNS.md` - Complete values.yaml templates
 - `references/LOGGING_SIDECARS.md` - Alloy/Loki configuration
 - `references/TROUBLESHOOTING_CHARTS.md` - Issue resolution

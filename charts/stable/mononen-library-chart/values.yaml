@@ -10,7 +10,6 @@ global:
   
   # Networking
   domain: ""
-  certificateARN: ""
   
   # Resource generation toggles (all true by default)
   resources:
@@ -53,7 +52,7 @@ global:
 
   logging:
     image:
-      repository: registry.moslrn.net/dh/grafana/alloy
+      repository: grafana/alloy
       tag: v1.9.1
 
 # Components map - consuming charts define their components here
@@ -100,19 +99,21 @@ global:
 #     
 #     # Ingress config
 #     ingress:
+#       className: ""           # ingressClassName (e.g., nginx, traefik)
 #       subdomain: ""           # Override subdomain (defaults to component name)
-#       certificateARN: ""      # Override global certificate ARN
-#       paths: []               # Custom path routing (defaults to / -> service)
+#       annotations: {}         # Shared annotations for all ingresses
 #       internal:
-#         enabled: true         # Internal ALB (enabled by default)
-#         healthcheckPath: ""   # Optional: override auto-inherited from probes
-#                               # Auto-inherits from readinessProbe/livenessProbe httpGet.path
-#         annotations: {}
+#         enabled: true         # Internal ingress (enabled by default)
+#         className: ""         # Override ingressClassName for this type
+#         annotations: {}       # Per-type annotations
+#         paths: []             # Custom path routing (defaults to / -> service)
+#         tls: []               # TLS configuration
 #       external:
-#         enabled: false        # External ALB (disabled by default)
-#         healthcheckPath: ""   # Optional: override auto-inherited from probes
-#                               # Set different path for external ALB if needed
+#         enabled: false        # External ingress (disabled by default)
+#         className: ""
 #         annotations: {}
+#         paths: []
+#         tls: []
 #     
 #     # Autoscaling
 #     autoscaling:

@@ -10,7 +10,7 @@
 |------|---------|
 | `VALUES_PATTERNS.md` | Complete values.yaml structure and patterns |
 | `COMPONENT_EXAMPLES.md` | Multi-container, storage, secrets, jobs |
-| `ALB_INGRESS_CONFIG.md` | ALB annotation helpers and patterns |
+| `INGRESS_CONFIG.md` | Ingress configuration and host generation |
 
 ### Specialized Topics
 
@@ -30,10 +30,10 @@ This folder should be symlinked into each chart skill directory:
 
 ```bash
 # For new-helm-chart skill
-ln -s /path/to/ml-common-library-chart/docs/references ~/.cursor/skills/new-helm-chart/references
+ln -s /path/to/mononen-library-chart/docs/references ~/.cursor/skills/new-helm-chart/references
 
 # For migrate-helm-chart skill
-ln -s /path/to/ml-common-library-chart/docs/references ~/.cursor/skills/migrate-helm-chart/references
+ln -s /path/to/mononen-library-chart/docs/references ~/.cursor/skills/migrate-helm-chart/references
 ```
 
 ## Progressive Loading
@@ -42,7 +42,7 @@ The main SKILL.md files are intentionally kept small (~150-200 lines) for effici
 
 - Complete values.yaml templates
 - Detailed component configuration examples
-- ALB ingress annotation helpers
+- Ingress configuration and host generation
 - Troubleshooting procedures
 
 ## Adding More References

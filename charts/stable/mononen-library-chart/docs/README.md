@@ -12,7 +12,7 @@ Use when creating **new Helm charts from scratch** using the common-library-char
 
 **Capabilities:**
 - Component-based values.yaml structure
-- Auto-generated ALB ingress annotations
+- Auto-generated ingress with configurable class and annotations
 - Security contexts and resource limits
 - Multi-environment configuration
 
@@ -26,7 +26,7 @@ Use when **migrating existing Helm charts** to use the common-library-chart.
 - Restructures values.yaml to component-based
 - Adds library dependency
 - Updates template references
-- Implements ALB annotation helpers
+- Migrates ingress configuration
 
 ### modify-chart
 
@@ -38,7 +38,7 @@ Use when **making incremental changes** to existing Helm charts.
 - Add ingress (internal/external), sidecars, or init containers
 - Add persistent storage, ConfigMaps, or Secrets
 - Add CronJobs, Jobs, or ServiceMonitors
-- Enable logging sidecar, customize ALB annotations
+- Enable logging sidecar, customize ingress annotations
 
 ## References
 
@@ -50,7 +50,7 @@ Detailed reference materials loaded on-demand by the agent:
 |------|---------|
 | `VALUES_PATTERNS.md` | Complete values.yaml templates |
 | `COMPONENT_EXAMPLES.md` | Multi-container, storage, secrets, jobs |
-| `ALB_INGRESS_CONFIG.md` | Ingress annotation helpers |
+| `INGRESS_CONFIG.md` | Ingress configuration and host generation |
 | `TROUBLESHOOTING_CHARTS.md` | Issue resolution |
 | `LOGGING_SIDECARS.md` | Alloy/Loki configuration |
 
@@ -61,18 +61,18 @@ All chart skills share the same references folder:
 ```bash
 # new-helm-chart skill
 mkdir -p ~/.cursor/skills/new-helm-chart
-ln -s /path/to/ml-common-library-chart/docs/new-helm-chart/SKILL.md ~/.cursor/skills/new-helm-chart/SKILL.md
-ln -s /path/to/ml-common-library-chart/docs/references ~/.cursor/skills/new-helm-chart/references
+ln -s /path/to/mononen-library-chart/docs/new-helm-chart/SKILL.md ~/.cursor/skills/new-helm-chart/SKILL.md
+ln -s /path/to/mononen-library-chart/docs/references ~/.cursor/skills/new-helm-chart/references
 
 # migrate-helm-chart skill
 mkdir -p ~/.cursor/skills/migrate-helm-chart
-ln -s /path/to/ml-common-library-chart/docs/migrate-helm-chart/SKILL.md ~/.cursor/skills/migrate-helm-chart/SKILL.md
-ln -s /path/to/ml-common-library-chart/docs/references ~/.cursor/skills/migrate-helm-chart/references
+ln -s /path/to/mononen-library-chart/docs/migrate-helm-chart/SKILL.md ~/.cursor/skills/migrate-helm-chart/SKILL.md
+ln -s /path/to/mononen-library-chart/docs/references ~/.cursor/skills/migrate-helm-chart/references
 
 # modify-chart skill
 mkdir -p ~/.cursor/skills/modify-chart
-ln -s /path/to/ml-common-library-chart/docs/modify-chart/SKILL.md ~/.cursor/skills/modify-chart/SKILL.md
-ln -s /path/to/ml-common-library-chart/docs/references ~/.cursor/skills/modify-chart/references
+ln -s /path/to/mononen-library-chart/docs/modify-chart/SKILL.md ~/.cursor/skills/modify-chart/SKILL.md
+ln -s /path/to/mononen-library-chart/docs/references ~/.cursor/skills/modify-chart/references
 ```
 
 ## Progressive Loading
@@ -81,12 +81,12 @@ The SKILL.md files are intentionally small (~150 lines) for efficient context us
 
 - Complete values.yaml templates
 - Detailed component configuration examples
-- ALB ingress annotation helpers
+- Ingress configuration and host generation
 - Troubleshooting procedures
 
 ## Version Information
 
 - **Chart Library:** v1.0.0+
-- **Registry:** `oci://registry.moslrn.net/library/charts`
+- **Registry:** `https://mononen.github.io/charts/`
 - **Helm:** v3+
 - **Kubernetes:** v1.21+

@@ -16,7 +16,7 @@ Only generated when generate.logging=true AND component.logging.customConfig is 
 {{- $logTargets := $logging.logTargets | default list }}
 {{- $appName := $logging.appName | default $fullname }}
 {{- $env := $global.env | default "dev" }}
-{{- $lokiEndpoint := ($global.logs).lokiEndpoint | default "https://logs.moslrn.net" }}
+{{- $lokiEndpoint := ($global.logs).lokiEndpoint | default "" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -107,7 +107,7 @@ Used internally by the sidecar template when logging is enabled
 {{- $loggingDefaults := ($global.logging) | default dict }}
 {{- $imageDefaults := $loggingDefaults.image | default dict }}
 {{- $image := $logging.image | default dict }}
-{{- $imageRepo := $image.repository | default ($imageDefaults.repository | default "registry.moslrn.net/dh/grafana/alloy") }}
+{{- $imageRepo := $image.repository | default ($imageDefaults.repository | default "grafana/alloy") }}
 {{- $imageTag := $image.tag | default ($imageDefaults.tag | default "v1.9.1") }}
 {{- $resources := $logging.resources | default dict }}
 - name: logging-sidecar
@@ -211,7 +211,7 @@ Use this in custom alloy-configmap.yaml templates:
 */}}
 {{- define "common.logging.alloy-header" -}}
 {{- $global := .Values.global | default dict }}
-{{- $lokiEndpoint := ($global.logs).lokiEndpoint | default "https://logs.moslrn.net" }}
+{{- $lokiEndpoint := ($global.logs).lokiEndpoint | default "" }}
 loki.write "default" {
   endpoint {
     url = "{{ $lokiEndpoint }}/loki/api/v1/push"
